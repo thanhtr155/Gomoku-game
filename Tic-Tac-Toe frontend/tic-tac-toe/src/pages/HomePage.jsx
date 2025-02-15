@@ -9,16 +9,16 @@ const Home = () => {
       <h1 className="text-3xl font-bold mb-6">Welcome to Tic-Tac-Toe Game</h1>
       <div className="flex flex-col space-y-4">
         <button
-          onClick={() => navigate('/play')}
+          onClick={() => navigate('/playonline')}
           className="px-6 py-2 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600"
         >
           Play Online
         </button>
         <button
-          onClick={() => navigate('/play')}
+          onClick={() => navigate('/playai')}
           className="px-6 py-2 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600"
         >
-          Play With AI
+          Play
         </button>
         <button
           onClick={() => navigate('/login')}
