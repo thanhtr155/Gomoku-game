@@ -9,13 +9,22 @@ export default function App() {
   const winner = calculateWinner(board, size);
   const isDraw = !winner && board.every((cell) => cell !== null);
 
+  
+
   function handleClick(index) {
     if (board[index] || winner) return;
+  
     const newBoard = [...board];
     newBoard[index] = isXNext ? "X" : "O";
     setBoard(newBoard);
     setIsXNext(!isXNext);
+  
+    // Check if the game is a draw after making the move
+    if (!calculateWinner(newBoard, size) && newBoard.every((cell) => cell !== null)) {
+      alert("It's a Draw!");
+    }
   }
+  
 
   function resetGame() {
     setBoard(Array(size * size).fill(null));
@@ -56,7 +65,7 @@ export default function App() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
-      <h1 className="text-3xl font-bold mb-4">10x10 Tic-Tac-Toe (Win 5 in a Row)</h1>
+      <h1 className="text-3xl font-bold mb-4">Tic-Tac-Toe</h1>
       <div
         className="grid gap-1"
         style={{ gridTemplateColumns: `repeat(${size}, 1fr)` }}
