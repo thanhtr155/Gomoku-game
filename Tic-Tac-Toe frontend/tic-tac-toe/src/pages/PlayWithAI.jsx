@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function App() {
   const navigate = useNavigate();
-  const size = 5;
+  const size = 10;
   const [board, setBoard] = useState(Array(size * size).fill(null));
   const winner = calculateWinner(board, size);
   const isDraw = !winner && board.every((cell) => cell);
