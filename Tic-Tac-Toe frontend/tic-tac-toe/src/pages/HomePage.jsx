@@ -18,6 +18,12 @@ const Home = () => {
           onClick={() => navigate('/playai')}
           className="px-6 py-2 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600"
         >
+          Play With AI
+        </button>
+        <button
+          onClick={() => navigate('/play')}
+          className="px-6 py-2 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600"
+        >
           Play
         </button>
         <button
