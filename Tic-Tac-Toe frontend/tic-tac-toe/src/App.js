@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage';
 import Play from './pages/Play';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import PlayWithAI from './pages/PlayWithAI';
 import PlayOnline from './pages/PlayOnline';
 
 function App() {
@@ -14,7 +15,8 @@ function App() {
     <Route path='/' element={<HomePage />}/>
     <Route path='/login' element={<Login />}/>
     <Route path='/register' element={<Register />}/>
-    <Route path="/playai" element={<Play />}/>
+    <Route path="/play" element={<Play />}/>
+    <Route path="/playai" element={<PlayWithAI />}/>
     <Route path="/playonline" element={<PlayOnline />}/>
 
    </Routes>
