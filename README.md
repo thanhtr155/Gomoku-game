@@ -1,2 +1,2 @@
 # Gomoku-game
- Komoku game final project
+ Gomoku game final project
