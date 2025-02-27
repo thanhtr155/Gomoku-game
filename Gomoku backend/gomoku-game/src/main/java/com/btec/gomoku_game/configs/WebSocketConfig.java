@@ -16,17 +16,18 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/gomoku-websocket")
-                .setAllowedOrigins("http://localhost:3000")
-                .addInterceptors(new JwtHandshakeInterceptor()) // ✅ Attach JWT validation
-                .withSockJS();
+                .setAllowedOriginPatterns("*")  // ✅ Allow all origins
+                .withSockJS()
+                .setSessionCookieNeeded(false) // ✅ Disable session cookies for testing
+                .setWebSocketEnabled(true)  // ✅ Ensure WebSocket transport is enabled
+                .setHttpMessageCacheSize(0); // ✅ Prevent caching issues
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/topic", "/queue");
+        registry.enableSimpleBroker("/topic");
         registry.setApplicationDestinationPrefixes("/app");
     }
-
 
     /**
      * Interceptor to extract JWT token from WebSocket connection.
