@@ -65,7 +65,7 @@ export default function App() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
-      <h1 className="text-3xl font-bold mb-4">Tic-Tac-Toe</h1>
+      <h1 className="text-3xl font-bold mb-4">Gomoku</h1>
       <div
         className="grid gap-1"
         style={{ gridTemplateColumns: `repeat(${size}, 1fr)` }}
@@ -89,7 +89,7 @@ export default function App() {
         Reset Game
       </button>
       <button
-        onClick={() => navigate("/")}
+        onClick={() => navigate("/main")}
         className="px-6 py-2 mt-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600"
       >
         Back
