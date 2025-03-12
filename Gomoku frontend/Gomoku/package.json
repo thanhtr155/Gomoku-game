@@ -4,7 +4,9 @@
   "private": true,
   "dependencies": {
     "@stomp/stompjs": "^7.0.0",
+    "axios": "^1.8.2",
     "cra-template": "1.2.0",
+    "crypto-browserify": "^3.12.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^7.1.5",
