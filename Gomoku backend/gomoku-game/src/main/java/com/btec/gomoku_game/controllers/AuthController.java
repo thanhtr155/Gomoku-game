@@ -19,7 +19,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
-@CrossOrigin(origins = "*")  // Allow all origins (or specify frontend URL)
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
