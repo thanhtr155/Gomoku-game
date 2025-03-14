@@ -1,12 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "../api"; // Import API function
+import { loginUser } from "../api";
 
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  // Ensure the token is cleared every time the app starts
+  useEffect(() => {
+    localStorage.removeItem("token");
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -19,8 +24,8 @@ const Login = () => {
 
     try {
       const data = await loginUser(email, password);
-      localStorage.setItem("token", data.token); // Store JWT token
-      navigate("/main"); // Redirect to Main Page
+      sessionStorage.setItem("token", data.token); // Store new token
+      navigate("/main"); // Redirect after login
     } catch (err) {
       setError(err || "Invalid login credentials.");
     }

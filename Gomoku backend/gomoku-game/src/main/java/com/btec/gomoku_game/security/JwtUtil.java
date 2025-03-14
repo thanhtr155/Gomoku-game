@@ -8,6 +8,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 import java.util.Date;
+import java.util.UUID;
 
 public class JwtUtil {
 
@@ -25,6 +26,7 @@ public class JwtUtil {
                 .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setId(UUID.randomUUID().toString()) // Ensure unique token each time
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
