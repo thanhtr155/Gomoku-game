@@ -64,5 +64,4 @@ const GomokuBoard = () => {
     </div>
   );
 };
-
 export default GomokuBoard;
