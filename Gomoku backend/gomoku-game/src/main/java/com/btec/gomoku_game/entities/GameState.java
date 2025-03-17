@@ -15,7 +15,7 @@ public class GameState {
     private String status;
     private Date createdAt;
 
-    private static final int BOARD_SIZE = 10;
+    private static final int BOARD_SIZE = 15;
     private static final int WIN_COUNT = 5;
 
     public GameState() {
