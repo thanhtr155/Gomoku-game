@@ -15,8 +15,8 @@ function App() {
   return (
    <BrowserRouter>
    <Routes>
-    <Route path='/' element={<HomePage />}/>
-    <Route path='/main' element={<MainPage />}/>
+    <Route path='/' element={<MainPage />}/>
+    <Route path='/main' element={<HomePage />}/>
     <Route path='/login' element={<Login />}/>
     <Route path='/register' element={<Register />}/>
     <Route path="/playoffline" element={<PlayOffline />}/>
