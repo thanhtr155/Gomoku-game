@@ -7,7 +7,6 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import PlayWithAI from './pages/PlayWithAI';
 import PlayOnline from './pages/PlayOnline';
-import GomokuBoard from './pages/GomokuBoard';
 import MainPage from './pages/MainPage';
 import ExplainRules from './pages/ExplainRules'
 
@@ -21,7 +20,7 @@ function App() {
     <Route path='/register' element={<Register />}/>
     <Route path="/playoffline" element={<PlayOffline />}/>
     <Route path="/playai" element={<PlayWithAI />}/>
-    <Route path="/playonline" element={<GomokuBoard />}/>
+    <Route path="/playonline" element={<PlayOnline />}/>
     <Route path="/rules" element={<ExplainRules />}/>
     
 
