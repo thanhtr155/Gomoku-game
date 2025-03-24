@@ -15,7 +15,7 @@ const MainPage = () => {
           Play Offline
         </button>
         <button
-          onClick={() => navigate('/playonline')}
+          onClick={() => navigate('/lobby')}
           className="px-6 py-2 bg-yellow-500 text-white font-bold rounded-lg hover:bg-yellow-600"
         >
           Play Online
