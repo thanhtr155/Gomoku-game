@@ -1,2 +1,2 @@
-# Tic-Tac-Toe-game
- Tic-Tac-Toe game for final project
+# Gomoku-game
+ Gomoku game final project
