@@ -2,6 +2,8 @@ package com.btec.gomoku_game.entities;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.Arrays;
 import java.util.List;
 
 @Document(collection = "rooms")
@@ -20,8 +22,11 @@ public class GameRoom {
         this.roomId = roomId;
         this.player1 = player1;
         this.player2 = null;
-        this.board = new String[15][15]; // 15x15 board
-        this.currentTurn = player1;
+        this.board = new String[15][15];
+        for (int i = 0; i < 15; i++) {
+            Arrays.fill(this.board[i], ""); // Khởi tạo với "" thay vì null
+        }
+        this.currentTurn = "X"; // Bắt đầu với "X"
         this.isFinished = false;
     }
 

@@ -11,17 +11,22 @@ const PlayOnline = () => {
   const { roomId, player } = location.state || {};
 
   const [client, setClient] = useState(null);
-  const [board, setBoard] = useState(Array(BOARD_SIZE * BOARD_SIZE).fill(null));
-  const [isXNext, setIsXNext] = useState(true);
-  const winner = calculateWinner(board, BOARD_SIZE);
+  const [board, setBoard] = useState(
+    Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(""))
+  );
+  const [currentTurn, setCurrentTurn] = useState("X");
+  const [winner, setWinner] = useState(null);
+  const [player1, setPlayer1] = useState(null);
+  const [player2, setPlayer2] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [chatInput, setChatInput] = useState("");
+  const [error, setError] = useState(null); // Thêm state để hiển thị lỗi
 
   useEffect(() => {
     if (!roomId || !player) {
       navigate("/lobby");
       return;
     }
-
-    console.log("Connecting to WebSocket...");
 
     const socket = new SockJS("http://localhost:8080/ws/game");
     const stompClient = new Client({
@@ -31,32 +36,37 @@ const PlayOnline = () => {
         console.log("✅ Connected to WebSocket!");
 
         stompClient.subscribe(`/topic/game/${roomId}`, (message) => {
-          console.log("📩 Received WebSocket message:", message.body);
-        
-          try {
-            const updatedGame = JSON.parse(message.body);
-            console.log("🔄 Updated Game State:", updatedGame);
-        
-            if (!updatedGame.board) {
-              console.error("🚨 Missing board data in received message:", updatedGame);
-              return;
-            }
-        
-            console.log("⬇️ Setting new board state:", updatedGame.board);
-            setBoard([...updatedGame.board]); // Ensure re-render
-            setIsXNext(updatedGame.currentTurn === "X");
-          } catch (error) {
-            console.error("🚨 Error parsing WebSocket message:", error);
-          }
+          const updatedGame = JSON.parse(message.body);
+          console.log("🔄 Game State:", updatedGame);
+          setBoard(updatedGame.board);
+          setCurrentTurn(updatedGame.currentTurn);
+          setWinner(updatedGame.winner);
+          setPlayer1(updatedGame.player1);
+          setPlayer2(updatedGame.player2);
+          setError(null); // Xóa lỗi nếu nhận được trạng thái
         });
-        
 
-        // Request the initial game state from the server
+        stompClient.subscribe(`/topic/chat/${roomId}`, (message) => {
+          const chat = JSON.parse(message.body);
+          console.log("💬 Chat:", chat);
+          setMessages((prev) => [...prev, `${chat.sender}: ${chat.content}`]);
+        });
+
         stompClient.publish({
           destination: "/app/game/state",
           body: JSON.stringify({ roomId }),
         });
-        console.log("📨 Requested game state from server");
+
+        // Timeout để kiểm tra nếu không nhận được trạng thái
+        setTimeout(() => {
+          if (!player1) {
+            setError("Failed to load game state. Room may not exist.");
+          }
+        }, 5000);
+      },
+      onStompError: (error) => {
+        console.error("WebSocket Error:", error);
+        setError("Failed to connect to game server.");
       },
     });
 
@@ -66,89 +76,123 @@ const PlayOnline = () => {
     return () => stompClient.deactivate();
   }, [roomId, player, navigate]);
 
-  const sendMove = (index) => {
-    if (!client || board[index] || winner) {
-      console.warn("Invalid move or game ended.");
+  const sendMove = (row, col) => {
+    if (!client) {
+      console.log("Move blocked: Client not ready");
+      return;
+    }
+    if (board[row][col]) {
+      console.log("Move blocked: Cell already taken");
+      return;
+    }
+    if (winner) {
+      console.log("Move blocked: Game is over");
+      return;
+    }
+    if (!player1 || !player2) {
+      console.log("Move blocked: Game state not loaded");
       return;
     }
 
-    if ((isXNext && player !== "X") || (!isXNext && player !== "O")) {
-      console.warn("Not your turn!");
+    const mySymbol = player === player1 ? "X" : "O";
+    if (mySymbol !== currentTurn) {
+      console.log("Move blocked: Not your turn!");
       return;
     }
 
-    console.log(`Sending move: Player ${player} to index ${index}`);
-
+    console.log(`Sending move: ${player} (${mySymbol}) to (${row}, ${col})`);
     client.publish({
       destination: "/app/game/move",
-      body: JSON.stringify({ roomId, index, player }),
+      body: JSON.stringify({ roomId, row, col, player }),
     });
   };
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
-      <h1 className="text-3xl font-bold mb-4">Gomoku - Room</h1>
-      <h2>Code "{roomId}" - Share code with your friends</h2>
-      <p className="text-lg">You are playing as: <strong>{player}</strong></p>
+  const sendChat = (e) => {
+    e.preventDefault();
+    if (!client || !chatInput.trim()) return;
 
-      {/* GAME BOARD */}
+    console.log(`Sending chat: ${player}: ${chatInput}`);
+    client.publish({
+      destination: "/app/game/chat",
+      body: JSON.stringify({ roomId, sender: player, content: chatInput }),
+    });
+    setChatInput("");
+  };
+
+  return (
+    <div className="flex flex-col items-center bg-gray-900 text-white min-h-screen p-4">
+      <h1 className="text-3xl font-bold my-4">Gomoku - Room</h1>
+      <h2>Code "{roomId}" - Share code with your friends</h2>
+      <p className="text-lg">You are: <strong>{player}</strong> ({player === player1 ? "X" : player === player2 ? "O" : "Loading..."})</p>
+      <p className="text-lg">
+        Players: <strong>{player1 || "Waiting..."}</strong> (X) vs{" "}
+        <strong>{player2 || "Waiting..."}</strong> (O)
+      </p>
+      <p className="text-lg">Current Turn: <strong>{currentTurn}</strong></p>
+      {winner && <p className="text-2xl mt-4">Winner: {winner}</p>}
+      {error && <p className="text-red-500 mt-4">{error}</p>}
+
       <div
-        className="grid gap-1 p-2 bg-gray-900 bg-opacity-70 rounded-lg"
-        style={{ gridTemplateColumns: `repeat(${BOARD_SIZE}, 1fr)` }}
+        className="grid gap-1 mt-4"
+        style={{
+          display: "grid",
+          gridTemplateColumns: `repeat(${BOARD_SIZE}, 1fr)`,
+          gridTemplateRows: `repeat(${BOARD_SIZE}, 1fr)`,
+          border: "2px solid white",
+        }}
       >
-        {board.map((cell, index) => (
-          <button
-            key={index}
-            onClick={() => sendMove(index)}
-            className="w-10 h-10 text-lg font-bold flex items-center justify-center bg-gray-800 border border-gray-600 rounded-lg hover:bg-gray-700"
-          >
-            {cell}
-          </button>
-        ))}
+        {board.map((row, rIdx) =>
+          row.map((cell, cIdx) => (
+            <button
+              key={`${rIdx}-${cIdx}`}
+              onClick={() => sendMove(rIdx, cIdx)}
+              className={`w-8 h-8 border flex items-center justify-center ${
+                cell === "X"
+                  ? "bg-blue-500 text-white"
+                  : cell === "O"
+                  ? "bg-red-500 text-white"
+                  : "bg-gray-800 hover:bg-gray-700"
+              }`}
+              disabled={winner || !player1 || !player2 || (player === player1 ? currentTurn !== "X" : currentTurn !== "O")}
+            >
+              {cell || ""}
+            </button>
+          ))
+        )}
       </div>
 
-      {winner && <p className="mt-4 text-xl font-semibold">{winner} Wins!</p>}
+      <div className="mt-6 w-1/2">
+        <h3 className="text-xl font-bold">Chat</h3>
+        <div className="h-40 bg-gray-800 p-2 overflow-y-auto rounded">
+          {messages.map((msg, idx) => (
+            <p key={idx} className="text-sm">{msg}</p>
+          ))}
+        </div>
+        <form onSubmit={sendChat} className="mt-2 flex">
+          <input
+            type="text"
+            value={chatInput}
+            onChange={(e) => setChatInput(e.target.value)}
+            className="flex-1 p-2 bg-gray-700 text-white rounded-l"
+            placeholder="Type a message..."
+          />
+          <button
+            type="submit"
+            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-r"
+          >
+            Send
+          </button>
+        </form>
+      </div>
 
       <button
         onClick={() => navigate("/lobby")}
-        className="mt-4 px-4 py-2 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600"
+        className="mt-6 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-lg"
       >
         Exit Game
       </button>
     </div>
   );
 };
-
-function calculateWinner(board, size) {
-  const directions = [
-    [1, 0], // Horizontal
-    [0, 1], // Vertical
-    [1, 1], // Diagonal (\)
-    [1, -1], // Diagonal (/)
-  ];
-
-  for (let row = 0; row < size; row++) {
-    for (let col = 0; col < size; col++) {
-      const start = row * size + col;
-      if (!board[start]) continue;
-
-      for (const [dx, dy] of directions) {
-        let count = 1;
-        for (let step = 1; step < 5; step++) {
-          const x = row + dx * step;
-          const y = col + dy * step;
-          if (x < 0 || x >= size || y < 0 || y >= size) break;
-          if (board[x * size + y] === board[start]) {
-            count++;
-          } else {
-            break;
-          }
-        }
-        if (count === 5) return board[start];
-      }
-    }
-  }
-  return null;
-}
 
 export default PlayOnline;
