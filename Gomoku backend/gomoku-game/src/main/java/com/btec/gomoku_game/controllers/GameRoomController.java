@@ -31,8 +31,6 @@ public class GameRoomController {
         return ResponseEntity.ok(gameRoom);
     }
 
-    
-
     @PostMapping("/join")
     public ResponseEntity<GameRoom> joinRoom(@RequestBody Map<String, String> request) {
         String roomId = request.get("roomId");
@@ -56,21 +54,5 @@ public class GameRoomController {
         return ResponseEntity.ok(gameRoom);
     }
 
-    public GameRoom joinRoom(String roomId, String player2) {
-        Optional<GameRoom> roomOptional = gameRoomRepository.findByRoomId(roomId);
-        if (roomOptional.isPresent()) {
-            GameRoom gameRoom = roomOptional.get();
-            if (gameRoom.getPlayer2() != null) {
-                throw new IllegalArgumentException("Room is full");
-            }
-            if (gameRoom.getPlayer1().equals(player2)) {
-                throw new IllegalArgumentException("Cannot join as the same player");
-            }
-            gameRoom.setPlayer2(player2);
-            GameRoom updatedRoom = gameRoomRepository.save(gameRoom);
-            messagingTemplate.convertAndSend("/topic/game/" + roomId, updatedRoom); // Thông báo phòng đã sẵn sàng
-            return updatedRoom;
-        }
-        throw new RuntimeException("Room not found");
-    }
+    
 }
