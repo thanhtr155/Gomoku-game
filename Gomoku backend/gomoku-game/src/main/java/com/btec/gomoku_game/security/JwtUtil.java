@@ -4,22 +4,11 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 
 import java.util.Date;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-
-import java.util.Date;
 
 public class JwtUtil {
+    private static final String SECRET_KEY = "Akjhsdfjkhsdfhsadhjaskdhasjkhdkjsahdjkashdjkashdjksahdjksadhsakjh"; // Nên lưu trong file cấu hình
+    private static final long EXPIRATION_TIME = 86400000; // 1 ngày
 
-    private static final String SECRET_KEY = "Akjhsdfjkhsdfhsadhjaskdhasjkhdkjsahdjkashdjkashdjksahdjksadhsakjh"; // Use a secure key
-    private static final long EXPIRATION_TIME = 86400000; // 1 day in milliseconds
-
-    /**
-     * Generate a JWT token for a given email.
-     *
-     * @param email The user's email.
-     * @return The JWT token.
-     */
     public static String generateToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
@@ -42,7 +31,16 @@ public class JwtUtil {
         }
     }
 
-
-
-    // Existing methods for validation and claims extraction
+    // Thêm phương thức để lấy email từ token
+    public static String getEmailFromToken(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(SECRET_KEY)
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getSubject();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

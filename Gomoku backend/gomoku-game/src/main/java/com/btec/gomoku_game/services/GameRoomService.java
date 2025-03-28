@@ -1,32 +1,28 @@
 package com.btec.gomoku_game.services;
 
+import com.btec.gomoku_game.entities.GameHistory;
 import com.btec.gomoku_game.entities.GameRoom;
+import com.btec.gomoku_game.repositories.GameHistoryRepository;
 import com.btec.gomoku_game.repositories.GameRoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class GameRoomService {
     @Autowired
     private GameRoomRepository gameRoomRepository;
-
-
-    public List<GameRoom> getAvailableRooms() {
-        return gameRoomRepository.findAll().stream()
-                .filter(room -> room.getPlayer2() == null && !room.isFinished())
-                .collect(Collectors.toList());
-    }
+    @Autowired
+    private GameHistoryRepository gameHistoryRepository;
 
     public GameRoom createRoom(String roomId, String player1) {
         GameRoom gameRoom = new GameRoom(roomId, player1);
-        gameRoom.setCurrentTurn("X"); // Ensure X always starts
+        gameRoom.setCurrentTurn("X");
+        GameHistory history = new GameHistory(roomId, player1, null); // Lưu lịch sử khi tạo phòng
+        gameHistoryRepository.save(history);
         return gameRoomRepository.save(gameRoom);
     }
-
 
     public GameRoom makeMove(String roomId, int row, int col, String player) {
         Optional<GameRoom> roomOptional = getGameById(roomId);
@@ -41,6 +37,9 @@ public class GameRoomService {
         if (room.getPlayer2() == null) {
             throw new IllegalArgumentException("Waiting for second player");
         }
+        if (!player.equals(room.getPlayer1()) && !player.equals(room.getPlayer2())) {
+            throw new IllegalArgumentException("Player not in this room");
+        }
 
         String[][] board = room.getBoard();
         String expectedSymbol = player.equals(room.getPlayer1()) ? "X" : "O";
@@ -52,6 +51,14 @@ public class GameRoomService {
         if (checkWin(board, row, col, room.getCurrentTurn())) {
             room.setFinished(true);
             room.setWinner(player);
+            // Cập nhật lịch sử khi có người thắng
+            Optional<GameHistory> historyOpt = gameHistoryRepository.findById(roomId);
+            if (historyOpt.isPresent()) {
+                GameHistory history = historyOpt.get();
+                history.setWinner(player);
+                history.setEndTime(System.currentTimeMillis());
+                gameHistoryRepository.save(history);
+            }
         } else {
             room.setCurrentTurn(room.getCurrentTurn().equals("X") ? "O" : "X");
         }
@@ -59,8 +66,9 @@ public class GameRoomService {
         return gameRoomRepository.save(room);
     }
 
+    // Các phương thức khác giữ nguyên
     private boolean checkWin(String[][] board, int row, int col, String symbol) {
-        // Kiểm tra 5 quân liên tiếp theo 4 hướng: ngang, dọc, chéo chính, chéo phụ
+        // Logic giữ nguyên
         int[][] directions = {{0, 1}, {1, 0}, {1, 1}, {1, -1}};
         for (int[] dir : directions) {
             int count = 1;
@@ -87,16 +95,28 @@ public class GameRoomService {
         return false;
     }
 
-
     public Optional<GameRoom> getGameById(String roomId) {
         return gameRoomRepository.findByRoomId(roomId);
     }
 
     public GameRoom joinRoom(String roomId, String player2) {
-        Optional<GameRoom> roomOptional = gameRoomRepository.findByRoomId(roomId); // Giả định bạn dùng MongoDB repository
+        Optional<GameRoom> roomOptional = gameRoomRepository.findByRoomId(roomId);
         if (roomOptional.isPresent()) {
             GameRoom gameRoom = roomOptional.get();
+            if (gameRoom.getPlayer2() != null) {
+                throw new IllegalArgumentException("Room is full");
+            }
+            if (gameRoom.getPlayer1().equals(player2)) {
+                throw new IllegalArgumentException("Cannot join as the same player");
+            }
             gameRoom.setPlayer2(player2);
+            // Cập nhật lịch sử khi player2 tham gia
+            Optional<GameHistory> historyOpt = gameHistoryRepository.findById(roomId);
+            if (historyOpt.isPresent()) {
+                GameHistory history = historyOpt.get();
+                history.setPlayer2(player2);
+                gameHistoryRepository.save(history);
+            }
             return gameRoomRepository.save(gameRoom);
         }
         throw new RuntimeException("Room not found");
