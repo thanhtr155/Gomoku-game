@@ -238,6 +238,49 @@ public class WebSocketGameHandler {
         return false;
     }
 
+    @MessageMapping("/game/leave")
+    public void handleLeaveRoom(@Payload LeaveRequest request) {
+        logger.info("Received leave request: {}", request);
+        if (request == null || request.getRoomId() == null || request.getPlayerEmail() == null) {
+            logger.warn("Invalid leave request: roomId or playerEmail is null");
+            messagingTemplate.convertAndSend("/topic/game/" + (request != null ? request.getRoomId() : "error"), new ErrorMessage("Invalid leave request"));
+            return;
+        }
+        String roomId = request.getRoomId();
+        Optional<GameRoom> gameRoomOptional = gameRoomService.getGameById(roomId);
+        if (gameRoomOptional.isPresent()) {
+            GameRoom gameRoom = gameRoomOptional.get();
+            if (gameRoom.isFinished()) {
+                // Nếu trò chơi đã kết thúc, xóa phòng ngay lập tức
+                gameRoomService.deleteGameRoom(roomId);
+                logger.info("Room {} deleted as game is finished and player {} left", roomId, request.getPlayerEmail());
+                messagingTemplate.convertAndSend("/topic/game/" + roomId, new ErrorMessage("Game finished - room deleted"));
+                return;
+            }
+            if (request.getPlayerEmail().equals(gameRoom.getPlayer1())) {
+                gameRoom.setPlayer1(null);
+            } else if (request.getPlayerEmail().equals(gameRoom.getPlayer2())) {
+                gameRoom.setPlayer2(null);
+            } else {
+                logger.warn("Player {} not in room {}", request.getPlayerEmail(), roomId);
+                messagingTemplate.convertAndSend("/topic/game/" + roomId, new ErrorMessage("Player not in room"));
+                return;
+            }
+            if (gameRoom.getPlayer1() == null && gameRoom.getPlayer2() == null) {
+                gameRoomService.deleteGameRoom(roomId);
+                logger.info("Room {} deleted as both players left", roomId);
+                messagingTemplate.convertAndSend("/topic/game/" + roomId, new ErrorMessage("Room deleted as both players left"));
+            } else {
+                gameRoomService.saveGameRoom(gameRoom);
+                logger.info("Updated room state after player {} left: {}", request.getPlayerEmail(), gameRoom);
+                messagingTemplate.convertAndSend("/topic/game/" + roomId, gameRoom);
+            }
+        } else {
+            logger.warn("Room not found: {}", roomId);
+            messagingTemplate.convertAndSend("/topic/game/" + roomId, new ErrorMessage("Room not found"));
+        }
+    }
+
     private boolean checkDraw(GameRoom gameRoom) {
         String[][] board = gameRoom.getBoard();
         for (int r = 0; r < 15; r++) {
