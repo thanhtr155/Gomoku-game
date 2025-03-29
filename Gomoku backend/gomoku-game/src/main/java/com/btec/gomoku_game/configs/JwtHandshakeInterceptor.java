@@ -22,29 +22,38 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
         if (request instanceof ServletServerHttpRequest) {
             ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
             String token = servletRequest.getServletRequest().getHeader("Authorization");
+            if (token == null) {
+                // Lấy token từ query parameter nếu không có trong header
+                token = servletRequest.getServletRequest().getParameter("token");
+            }
             String sessionId = servletRequest.getServletRequest().getSession().getId();
             String roomId = servletRequest.getServletRequest().getParameter("roomId");
 
+            logger.info("Received WebSocket handshake: token={}, sessionId={}, roomId={}", token, sessionId, roomId);
+
             if (token != null && token.startsWith("Bearer ")) {
-                token = token.substring(7); // Loại bỏ "Bearer "
+                token = token.substring(7);
                 try {
                     if (JwtUtil.verifyToken(token)) {
                         String email = JwtUtil.getEmailFromToken(token);
                         if (email != null && roomId != null) {
                             attributes.put("sessionId", sessionId);
                             attributes.put("roomId", roomId);
-                            attributes.put("email", email); // Lưu email vào attributes để WebSocketHandler sử dụng
+                            attributes.put("email", email);
                             logger.info("JWT verified for email: {} in room: {}", email, roomId);
                             return true;
+                        } else {
+                            logger.warn("Email or roomId is null: email={}, roomId={}", email, roomId);
                         }
                     }
                 } catch (Exception e) {
                     logger.warn("JWT verification failed: {}", e.getMessage());
                 }
             } else {
-                logger.warn("No valid Authorization header found");
+                logger.warn("No valid Authorization header or token parameter found");
             }
-            response.setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
+            logger.warn("Handshake failed, returning 400 Bad Request");
+            response.setStatusCode(org.springframework.http.HttpStatus.BAD_REQUEST);
             return false;
         }
         return true;
@@ -55,4 +64,6 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
                                WebSocketHandler wsHandler, Exception exception) {
         // Không cần xử lý sau handshake
     }
+
+
 }
