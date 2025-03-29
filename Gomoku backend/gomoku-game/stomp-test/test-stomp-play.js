@@ -1,11 +1,11 @@
 const Stomp = require('@stomp/stompjs');
 
 const client = new Stomp.Client({
-    brokerURL: 'ws://localhost:8080/ws/game?roomId=room134&token=Bearer%20eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwbGF5ZXIxQGV4YW1wbGUuY29tIiwiaWF0IjoxNzQzMjQyMzM3LCJleHAiOjE3NDMzMjg3Mzd9.IT_WoZ8nT4hy6OasYqZYzHOWU66uiIuK8yEw6-ObGQ0',
+    brokerURL: 'ws://localhost:8080/ws/game?roomId=room135&token=Bearer%20eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwbGF5ZXIxQGV4YW1wbGUuY29tIiwiaWF0IjoxNzQzMjU3NDczLCJleHAiOjE3NDMzNDM4NzN9.ljLQMIAjtl6AgWeRhxMFPNYnLyVwChklk_ZbLdkDrUw',
     debug: (str) => console.log(str),
     onConnect: () => {
         console.log('Connected to WebSocket!');
-        client.subscribe('/topic/game/room134', (msg) => {
+        client.subscribe('/topic/game/room135', (msg) => {
             console.log('Received:', msg.body);
             const data = JSON.parse(msg.body);
             if (data.message) {
@@ -19,20 +19,20 @@ const client = new Stomp.Client({
         });
         client.publish({
             destination: '/app/game/state',
-            body: JSON.stringify({ roomId: 'room134' })
+            body: JSON.stringify({ roomId: 'room135' })
         });
 
         // Các nước đi để tạo điều kiện thắng cho Player 1
         const moves = [
-            { row: 1, col: 1, player: 'player1@example.com' }, // Player 1 (X)
-            { row: 2, col: 1, player: 'player6@example.com' }, // Player 2 (O)
-            { row: 1, col: 2, player: 'player1@example.com' }, // Player 1 (X)
-            { row: 2, col: 2, player: 'player6@example.com' }, // Player 2 (O)
-            { row: 1, col: 3, player: 'player1@example.com' }, // Player 1 (X)
-            { row: 2, col: 3, player: 'player6@example.com' }, // Player 2 (O)
-            { row: 1, col: 4, player: 'player1@example.com' }, // Player 1 (X)
-            { row: 2, col: 4, player: 'player6@example.com' }, // Player 2 (O)
-            { row: 1, col: 5, player: 'player1@example.com' }  // Player 1 (X) - Thắng
+            { row: 1, col: 1, playerSymbol: 'X' }, // Player 1 (X)
+            { row: 2, col: 1, playerSymbol: 'O' }, // Player 2 (O)
+            { row: 1, col: 2, playerSymbol: 'X' }, // Player 1 (X)
+            { row: 2, col: 2, playerSymbol: 'O' }, // Player 2 (O)
+            { row: 1, col: 3, playerSymbol: 'X' }, // Player 1 (X)
+            { row: 2, col: 3, playerSymbol: 'O' }, // Player 2 (O)
+            { row: 1, col: 4, playerSymbol: 'X' }, // Player 1 (X)
+            { row: 2, col: 4, playerSymbol: 'O' }, // Player 2 (O)
+            { row: 1, col: 5, playerSymbol: 'X' }  // Player 1 (X) - Thắng
         ];
 
         let index = 0; // Bắt đầu từ nước đi đầu tiên
@@ -41,15 +41,15 @@ const client = new Stomp.Client({
         const sendMove = () => {
             if (index < moves.length && !gameFinished) {
                 const move = moves[index];
-                const playerLabel = move.player === 'player1@example.com' ? 'Player 1 (X)' : 'Player 2 (O)';
+                const playerLabel = move.playerSymbol === 'X' ? 'Player 1 (X)' : 'Player 2 (O)';
                 console.log(`Sending move: ${playerLabel} places at [${move.row},${move.col}]`);
                 client.publish({
                     destination: '/app/game/move',
                     body: JSON.stringify({
-                        roomId: 'room134',
+                        roomId: 'room135',
                         row: move.row,
                         col: move.col,
-                        player: move.player
+                        playerSymbol: move.playerSymbol
                     })
                 });
                 index++;

@@ -26,7 +26,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws/game")
                 .setAllowedOriginPatterns("http://localhost:3000", "http://gomoku.io.vn")
-                .addInterceptors(handshakeInterceptor);
-                // .withSockJS()
+                .addInterceptors(handshakeInterceptor)
+                .withSockJS();
     }
 }
