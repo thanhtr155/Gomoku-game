@@ -5,6 +5,7 @@ import com.btec.gomoku_game.entities.GameRoom;
 import com.btec.gomoku_game.repositories.GameHistoryRepository;
 import com.btec.gomoku_game.repositories.GameRoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate; // Thêm import
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -15,13 +16,29 @@ public class GameRoomService {
     private GameRoomRepository gameRoomRepository;
     @Autowired
     private GameHistoryRepository gameHistoryRepository;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     public GameRoom createRoom(String roomId, String player1) {
+        if (gameRoomRepository.findByRoomId(roomId).isPresent()) {
+            throw new IllegalArgumentException("Room ID already exists");
+        }
         GameRoom gameRoom = new GameRoom(roomId, player1);
         gameRoom.setCurrentTurn("X");
-        GameHistory history = new GameHistory(roomId, player1, null); // Lưu lịch sử khi tạo phòng
+        GameHistory history = new GameHistory(roomId, player1, null);
         gameHistoryRepository.save(history);
-        return gameRoomRepository.save(gameRoom);
+        gameRoom = gameRoomRepository.save(gameRoom);
+        messagingTemplate.convertAndSend("/topic/game/" + roomId, gameRoom); // Thông báo phòng được tạo
+        return gameRoom;
+    }
+
+    public void saveGameRoom(GameRoom gameRoom) {
+        gameRoomRepository.save(gameRoom);
+    }
+
+    public void deleteGameRoom(String roomId) {
+        gameRoomRepository.deleteByRoomId(roomId);
+        gameHistoryRepository.deleteById(roomId);
     }
 
     public GameRoom makeMove(String roomId, int row, int col, String player) {
@@ -51,7 +68,6 @@ public class GameRoomService {
         if (checkWin(board, row, col, room.getCurrentTurn())) {
             room.setFinished(true);
             room.setWinner(player);
-            // Cập nhật lịch sử khi có người thắng
             Optional<GameHistory> historyOpt = gameHistoryRepository.findById(roomId);
             if (historyOpt.isPresent()) {
                 GameHistory history = historyOpt.get();
@@ -60,15 +76,26 @@ public class GameRoomService {
                 gameHistoryRepository.save(history);
             }
         } else {
-            room.setCurrentTurn(room.getCurrentTurn().equals("X") ? "O" : "X");
+            int filledCells = 0;
+            for (String[] rowBoard : board) {
+                for (String cell : rowBoard) {
+                    if (!cell.isEmpty()) filledCells++;
+                }
+            }
+            if (filledCells == 15 * 15) {
+                room.setFinished(true);
+                room.setWinner(null); // Hòa
+            } else {
+                room.setCurrentTurn(room.getCurrentTurn().equals("X") ? "O" : "X");
+            }
         }
-
-        return gameRoomRepository.save(room);
+        gameRoomRepository.save(room);
+        messagingTemplate.convertAndSend("/topic/game/" + roomId, room); // Thông báo nước đi
+        return room;
     }
 
-    // Các phương thức khác giữ nguyên
+
     private boolean checkWin(String[][] board, int row, int col, String symbol) {
-        // Logic giữ nguyên
         int[][] directions = {{0, 1}, {1, 0}, {1, 1}, {1, -1}};
         for (int[] dir : directions) {
             int count = 1;
@@ -110,15 +137,19 @@ public class GameRoomService {
                 throw new IllegalArgumentException("Cannot join as the same player");
             }
             gameRoom.setPlayer2(player2);
-            // Cập nhật lịch sử khi player2 tham gia
             Optional<GameHistory> historyOpt = gameHistoryRepository.findById(roomId);
             if (historyOpt.isPresent()) {
                 GameHistory history = historyOpt.get();
                 history.setPlayer2(player2);
                 gameHistoryRepository.save(history);
             }
-            return gameRoomRepository.save(gameRoom);
+            gameRoom = gameRoomRepository.save(gameRoom);
+            messagingTemplate.convertAndSend("/topic/game/" + roomId, gameRoom); // Thông báo player2 tham gia
+            return gameRoom;
         }
         throw new RuntimeException("Room not found");
     }
+
+
+
 }

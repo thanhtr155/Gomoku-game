@@ -1,6 +1,5 @@
 package com.btec.gomoku_game.configs;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -10,20 +9,24 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-    @Autowired
-    private JwtHandshakeInterceptor handshakeInterceptor;
+
+    private final JwtHandshakeInterceptor handshakeInterceptor;
+
+    public WebSocketConfig(JwtHandshakeInterceptor handshakeInterceptor) {
+        this.handshakeInterceptor = handshakeInterceptor;
+    }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic");
-        config.setApplicationDestinationPrefixes("/app");
+        config.enableSimpleBroker("/topic"); // Định nghĩa prefix cho các topic
+        config.setApplicationDestinationPrefixes("/app"); // Định nghĩa prefix cho các message gửi đến
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws/game")
                 .setAllowedOriginPatterns("http://localhost:3000", "http://gomoku.io.vn")
-                .addInterceptors(handshakeInterceptor)
-                .withSockJS();
+                .addInterceptors(handshakeInterceptor);
+                // .withSockJS()
     }
 }
