@@ -116,9 +116,9 @@ const PlayOnline = () => {
           setIsGameFinished(gameState.finished || false);
           setIsLoading(false);
 
-          // Kiểm tra nếu player1 rời phòng (dự phòng)
-          if (!gameState.player1 && gameState.player2 === player) {
-            setNotification("Room creator has left. Returning to lobby...");
+          // Kiểm tra nếu player1 rời phòng (player1 = null)
+          if (gameState.player1 === null && gameState.player2 !== null) {
+            setNotification("The room creator has left. Returning to lobby...");
             setTimeout(() => {
               navigate("/lobby");
             }, 2000);
