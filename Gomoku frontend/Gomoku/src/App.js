@@ -9,7 +9,7 @@ import PlayWithAI from './pages/PlayWithAI';
 import PlayOnline from './pages/PlayOnline';
 import MainPage from './pages/MainPage';
 import ExplainRules from './pages/ExplainRules'
-import Lobby from './pages/Lobby';
+import GameLobby from './pages/GameLobby';
 
 
 function App() {
@@ -24,7 +24,7 @@ function App() {
     <Route path="/playai" element={<PlayWithAI />}/>
     <Route path="/playonline" element={<PlayOnline />}/>
     <Route path="/rules" element={<ExplainRules />}/>
-    <Route path="/lobby" element={<Lobby />}/>
+    <Route path="/lobby" element={<GameLobby/>}/>
 
     
 

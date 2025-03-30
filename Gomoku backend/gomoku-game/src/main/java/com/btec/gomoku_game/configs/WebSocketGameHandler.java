@@ -1,8 +1,6 @@
 package com.btec.gomoku_game.configs;
 
-import com.btec.gomoku_game.entities.ChatMessage;
-import com.btec.gomoku_game.entities.GameMove;
-import com.btec.gomoku_game.entities.GameRoom;
+import com.btec.gomoku_game.entities.*;
 import com.btec.gomoku_game.services.GameRoomService;
 import com.btec.gomoku_game.repositories.ChatMessageRepository;
 import org.slf4j.Logger;
@@ -30,6 +28,7 @@ public class WebSocketGameHandler {
     private ChatMessageRepository chatMessageRepository;
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+
 
     private Map<String, String> sessionToRoomMap = new HashMap<>();
 
@@ -105,7 +104,23 @@ public class WebSocketGameHandler {
     public void processChat(ChatMessage message) {
         logger.info("Received chat: {}: {} in room {}", message.getSender(), message.getContent(), message.getRoomId());
         chatMessageRepository.save(message); // Lưu vào MongoDB
-        messagingTemplate.convertAndSend("/topic/chat/" + message.getRoomId(), message);
+        // Sửa destination để khớp với subscription của frontend
+        messagingTemplate.convertAndSend("/topic/game/" + message.getRoomId() + "/chat", message);
+    }
+
+
+    @MessageMapping("/game/rematch/request")
+    public void handleRematchRequest(@Payload RematchRequest rematchRequest) {
+        logger.info("Received rematch request from {} in room {}", rematchRequest.getPlayerEmail(), rematchRequest.getRoomId());
+        GameRoom gameRoom = gameRoomService.requestRematch(rematchRequest.getRoomId(), rematchRequest.getPlayerEmail());
+        messagingTemplate.convertAndSend("/topic/game/" + rematchRequest.getRoomId(), gameRoom);
+    }
+
+    @MessageMapping("/game/rematch/respond")
+    public void handleRematchResponse(@Payload RematchResponse rematchResponse) {
+        logger.info("Received rematch response from {} in room {}: {}", rematchResponse.getPlayerEmail(), rematchResponse.getRoomId(), rematchResponse.isAccepted());
+        GameRoom gameRoom = gameRoomService.respondToRematch(rematchResponse.getRoomId(), rematchResponse.getPlayerEmail(), rematchResponse.isAccepted());
+        messagingTemplate.convertAndSend("/topic/game/" + rematchResponse.getRoomId(), gameRoom);
     }
 
 
