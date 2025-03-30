@@ -18,92 +18,193 @@ const PlayOnline = () => {
   const [winner, setWinner] = useState(null);
   const [player1, setPlayer1] = useState(null);
   const [player2, setPlayer2] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([]); // Lưu tin nhắn dưới dạng object { sender, content, timestamp }
   const [chatInput, setChatInput] = useState("");
-  const [error, setError] = useState(null); // Thêm state để hiển thị lỗi
+  const [error, setError] = useState(null);
+  const [notification, setNotification] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [rematchRequested, setRematchRequested] = useState(false);
+  const [rematchRequestFrom, setRematchRequestFrom] = useState(null);
+  const [rematchDeclined, setRematchDeclined] = useState(false);
+  const [isGameFinished, setIsGameFinished] = useState(false);
 
   useEffect(() => {
+    console.log("PlayOnline: Checking location.state:");
+    console.log("roomId:", roomId);
+    console.log("player:", player);
+
     if (!roomId || !player) {
+      console.log("No roomId or player found, redirecting to /lobby");
       navigate("/lobby");
       return;
     }
 
-    const socket = new SockJS("http://localhost:8080/ws/game");
+    const token = localStorage.getItem("token");
+    console.log("PlayOnline: Checking token in localStorage:", token);
+
+    if (!token) {
+      console.log("No token found, redirecting to /login");
+      navigate("/login");
+      return;
+    }
+
+    const fetchRoomState = async () => {
+      try {
+        console.log(`Fetching room state for roomId: ${roomId}`);
+        const response = await fetch(`http://localhost:8080/api/games/get/${roomId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log("Response status:", response.status);
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.log("Error response:", errorData);
+          throw new Error(errorData.message || "Failed to fetch room state");
+        }
+
+        const gameState = await response.json();
+        console.log("Fetched room state:", gameState);
+        setBoard(gameState.board);
+        setCurrentTurn(gameState.currentTurn);
+        setWinner(gameState.winner);
+        setPlayer1(gameState.player1);
+        setPlayer2(gameState.player2);
+        setIsGameFinished(gameState.finished);
+        setIsLoading(false);
+        setRematchRequested(gameState.player1 === player ? gameState.player1WantsRematch : gameState.player2WantsRematch);
+        setRematchRequestFrom(
+          gameState.player1WantsRematch && gameState.player1 !== player ? gameState.player1 :
+          gameState.player2WantsRematch && gameState.player2 !== player ? gameState.player2 : null
+        );
+      } catch (error) {
+        console.error("Error fetching room state:", error);
+        setError(`Failed to fetch room state: ${error.message}. Please try again.`);
+      }
+    };
+
+    const socket = new SockJS(
+      `http://localhost:8080/ws/game?roomId=${roomId}&token=Bearer ${token}`
+    );
     const stompClient = new Client({
       webSocketFactory: () => socket,
       debug: console.log,
       onConnect: () => {
         console.log("✅ Connected to WebSocket!");
-
         stompClient.subscribe(`/topic/game/${roomId}`, (message) => {
-          const updatedGame = JSON.parse(message.body);
-          console.log("🔄 Game State:", updatedGame);
-          setBoard(updatedGame.board);
-          setCurrentTurn(updatedGame.currentTurn);
-          setWinner(updatedGame.winner);
-          setPlayer1(updatedGame.player1);
-          setPlayer2(updatedGame.player2);
-          setError(null); // Xóa lỗi nếu nhận được trạng thái
-        });
+          const gameState = JSON.parse(message.body);
+          console.log("Received game state:", gameState);
+          setBoard(gameState.board);
+          setCurrentTurn(gameState.currentTurn);
+          setWinner(gameState.winner);
+          setPlayer1(gameState.player1);
+          setPlayer2(gameState.player2);
+          setIsGameFinished(gameState.finished);
+          setIsLoading(false);
 
-        stompClient.subscribe(`/topic/chat/${roomId}`, (message) => {
-          const chat = JSON.parse(message.body);
-          console.log("💬 Chat:", chat);
-          setMessages((prev) => [...prev, `${chat.sender}: ${chat.content}`]);
-        });
+          // Cập nhật trạng thái rematch
+          const isPlayer1 = gameState.player1 === player;
+          const playerWantsRematch = isPlayer1 ? gameState.player1WantsRematch : gameState.player2WantsRematch;
+          const otherPlayerWantsRematch = isPlayer1 ? gameState.player2WantsRematch : gameState.player1WantsRematch;
+          const otherPlayerEmail = isPlayer1 ? gameState.player2 : gameState.player1;
 
-        stompClient.publish({
-          destination: "/app/game/state",
-          body: JSON.stringify({ roomId }),
-        });
+          setRematchRequested(playerWantsRematch);
+          setRematchRequestFrom(
+            otherPlayerWantsRematch && otherPlayerEmail !== player ? otherPlayerEmail : null
+          );
 
-        // Timeout để kiểm tra nếu không nhận được trạng thái
-        setTimeout(() => {
-          if (!player1) {
-            setError("Failed to load game state. Room may not exist.");
+          // Nếu một trong hai người từ chối rematch, hiển thị thông báo và quay lại lobby
+          if (gameState.rematchDeclined) {
+            setRematchDeclined(true);
+            setNotification("Rematch declined. Returning to lobby...");
+            setTimeout(() => {
+              navigate("/lobby");
+            }, 2000);
+            return; // Thoát ngay để không thực thi các điều kiện khác
           }
-        }, 5000);
+
+          // Nếu cả hai người chơi đồng ý rematch, reset trạng thái và thông báo
+          if (gameState.player1WantsRematch && gameState.player2WantsRematch) {
+            setRematchRequested(false);
+            setRematchRequestFrom(null);
+            setRematchDeclined(false);
+            setNotification("Starting a new game!");
+            setWinner(null);
+          }
+          // Nếu ván đấu chưa kết thúc, xóa thông báo rematch
+          else if (!gameState.finished) {
+            setNotification(null);
+          }
+          // Nếu đang chờ phản hồi rematch và ván đấu đã kết thúc
+          else if (playerWantsRematch && !otherPlayerWantsRematch && gameState.finished) {
+            setNotification("Waiting for the other player to respond...");
+          }
+        });
+
+        // Subscription cho tin nhắn chat
+        stompClient.subscribe(`/topic/game/${roomId}/chat`, (message) => {
+          const chatMessage = JSON.parse(message.body);
+          console.log("Received chat message:", chatMessage);
+          // Chỉ thêm tin nhắn nếu nó không phải từ người gửi
+          if (chatMessage.sender !== player) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                sender: chatMessage.sender,
+                content: chatMessage.content,
+                timestamp: new Date().toLocaleTimeString(), // Thêm thời gian gửi
+              },
+            ]);
+          }
+        });
+
+        fetchRoomState();
       },
       onStompError: (error) => {
         console.error("WebSocket Error:", error);
-        setError("Failed to connect to game server.");
+        setError("Failed to connect to game server. Please try again.");
       },
     });
 
     stompClient.activate();
     setClient(stompClient);
 
-    return () => stompClient.deactivate();
+    return () => {
+      stompClient.deactivate();
+    };
   }, [roomId, player, navigate]);
 
   const sendMove = (row, col) => {
     if (!client) {
-      console.log("Move blocked: Client not ready");
+      setNotification("Client not ready. Please wait...");
       return;
     }
     if (board[row][col]) {
-      console.log("Move blocked: Cell already taken");
+      setNotification("This position is already taken.");
       return;
     }
     if (winner) {
-      console.log("Move blocked: Game is over");
+      setNotification("Game is over. Start a new game to continue.");
       return;
     }
     if (!player1 || !player2) {
-      console.log("Move blocked: Game state not loaded");
+      setNotification("Game state not loaded. Please wait...");
       return;
     }
 
     const mySymbol = player === player1 ? "X" : "O";
     if (mySymbol !== currentTurn) {
-      console.log("Move blocked: Not your turn!");
+      setNotification("It's not your turn!");
       return;
     }
 
     console.log(`Sending move: ${player} (${mySymbol}) to (${row}, ${col})`);
     client.publish({
       destination: "/app/game/move",
-      body: JSON.stringify({ roomId, row, col, player }),
+      body: JSON.stringify({ roomId, row, col, playerSymbol: mySymbol }),
     });
   };
 
@@ -112,6 +213,16 @@ const PlayOnline = () => {
     if (!client || !chatInput.trim()) return;
 
     console.log(`Sending chat: ${player}: ${chatInput}`);
+    // Hiển thị tin nhắn ngay lập tức trên giao diện của người gửi
+    const timestamp = new Date().toLocaleTimeString();
+    setMessages((prev) => [
+      ...prev,
+      {
+        sender: player,
+        content: chatInput,
+        timestamp: timestamp,
+      },
+    ]);
     client.publish({
       destination: "/app/game/chat",
       body: JSON.stringify({ roomId, sender: player, content: chatInput }),
@@ -119,18 +230,111 @@ const PlayOnline = () => {
     setChatInput("");
   };
 
+  const leaveRoom = () => {
+    if (!client) {
+      navigate("/lobby");
+      return;
+    }
+
+    console.log(`Leaving room: ${roomId}`);
+    client.publish({
+      destination: "/app/game/leave",
+      body: JSON.stringify({ roomId, playerEmail: player }),
+    });
+
+    setTimeout(() => navigate("/lobby"), 500);
+  };
+
+  const requestRematch = () => {
+    if (!client) {
+      setNotification("Client not ready. Please wait...");
+      return;
+    }
+
+    console.log(`Requesting rematch from ${player} in room ${roomId}`);
+    client.publish({
+      destination: "/app/game/rematch/request",
+      body: JSON.stringify({ roomId, playerEmail: player }),
+    });
+    setRematchRequested(true);
+    setNotification("Waiting for the other player to respond...");
+  };
+
+  const respondToRematch = (accepted) => {
+    if (!client) {
+      setNotification("Client not ready. Please wait...");
+      return;
+    }
+
+    console.log(`Responding to rematch: ${accepted} from ${player} in room ${roomId}`);
+    client.publish({
+      destination: "/app/game/rematch/respond",
+      body: JSON.stringify({ roomId, playerEmail: player, accepted }),
+    });
+    if (!accepted) {
+      setRematchDeclined(true);
+      setNotification("Rematch declined. Returning to lobby...");
+      setTimeout(() => {
+        navigate("/lobby");
+      }, 2000);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center bg-gray-900 text-white min-h-screen p-4">
+        <h1 className="text-3xl font-bold my-4">Loading...</h1>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center bg-gray-900 text-white min-h-screen p-4">
       <h1 className="text-3xl font-bold my-4">Gomoku - Room</h1>
       <h2>Code "{roomId}" - Share code with your friends</h2>
-      <p className="text-lg">You are: <strong>{player}</strong> ({player === player1 ? "X" : player === player2 ? "O" : "Loading..."})</p>
+      <p className="text-lg">
+        You are: <strong>{player}</strong> (
+        {player === player1 ? "X" : player === player2 ? "O" : "Loading..."})
+      </p>
       <p className="text-lg">
         Players: <strong>{player1 || "Waiting..."}</strong> (X) vs{" "}
         <strong>{player2 || "Waiting..."}</strong> (O)
       </p>
-      <p className="text-lg">Current Turn: <strong>{currentTurn}</strong></p>
+      <p className="text-lg">
+        Current Turn: <strong>{currentTurn}</strong>
+      </p>
       {winner && <p className="text-2xl mt-4">Winner: {winner}</p>}
       {error && <p className="text-red-500 mt-4">{error}</p>}
+      {notification && <p className="text-yellow-400 mt-4">{notification}</p>}
+
+      {winner && !rematchRequested && !rematchDeclined && (
+        <button
+          onClick={requestRematch}
+          className="mt-4 px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg"
+        >
+          Rematch
+        </button>
+      )}
+
+      {rematchRequestFrom && !rematchRequested && !rematchDeclined && (
+        <div className="mt-4">
+          <p className="text-lg">
+            {rematchRequestFrom} wants to rematch. Do you agree?
+          </p>
+          <button
+            onClick={() => respondToRematch(true)}
+            className="mt-2 mr-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg"
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => respondToRematch(false)}
+            className="mt-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg"
+          >
+            No
+          </button>
+        </div>
+      )}
 
       <div
         className="grid gap-1 mt-4"
@@ -153,7 +357,12 @@ const PlayOnline = () => {
                   ? "bg-red-500 text-white"
                   : "bg-gray-800 hover:bg-gray-700"
               }`}
-              disabled={winner || !player1 || !player2 || (player === player1 ? currentTurn !== "X" : currentTurn !== "O")}
+              disabled={
+                winner ||
+                !player1 ||
+                !player2 ||
+                (player === player1 ? currentTurn !== "X" : currentTurn !== "O")
+              }
             >
               {cell || ""}
             </button>
@@ -165,7 +374,15 @@ const PlayOnline = () => {
         <h3 className="text-xl font-bold">Chat</h3>
         <div className="h-40 bg-gray-800 p-2 overflow-y-auto rounded">
           {messages.map((msg, idx) => (
-            <p key={idx} className="text-sm">{msg}</p>
+            <p
+              key={idx}
+              className={`text-sm mb-1 ${
+                msg.sender === player ? "text-right text-blue-300" : "text-left text-green-300"
+              }`}
+            >
+              <span className="text-gray-400 text-xs">[{msg.timestamp}] </span>
+              <span className="font-bold">{msg.sender}:</span> {msg.content}
+            </p>
           ))}
         </div>
         <form onSubmit={sendChat} className="mt-2 flex">
@@ -186,7 +403,7 @@ const PlayOnline = () => {
       </div>
 
       <button
-        onClick={() => navigate("/lobby")}
+        onClick={leaveRoom}
         className="mt-6 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-lg"
       >
         Exit Game

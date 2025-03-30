@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "../services/api";
+import { loginUser } from "../services/authService";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -8,66 +8,39 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  // Ensure the token is cleared every time the app starts
-  useEffect(() => {
-    localStorage.removeItem("token");
-  }, []);
-
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
-
-    if (!email || !password) {
-      setError("Please fill in all fields.");
-      return;
-    }
-
     try {
-      const data = await loginUser(email, password);
-      sessionStorage.setItem("token", data.token); // Store new token
-      navigate("/main"); // Redirect after login
+      await loginUser(email, password);
+      navigate("/main"); // Điều hướng đến MainPage sau khi đăng nhập
     } catch (err) {
-      setError(err || "Invalid login credentials.");
+      setError(err.message || "Login failed!");
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
-      <h1 className="text-3xl font-bold mb-6">Login</h1>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      
-      <form onSubmit={handleLogin} className="flex flex-col items-center">
+    <div className="flex flex-col items-center bg-gray-900 text-white min-h-screen">
+      <h1 className="text-3xl font-bold my-4">Login</h1>
+      <form onSubmit={handleLogin} className="flex flex-col w-1/3">
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="px-4 py-2 mb-4 text-black rounded-lg w-64"
+          className="px-2 py-1 text-black rounded mb-2"
         />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="px-4 py-2 mb-4 text-black rounded-lg w-64"
+          className="px-2 py-1 text-black rounded mb-2"
         />
-        <button
-          type="submit"
-          className="px-6 py-2 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600 mb-4"
-        >
+        <button type="submit" className="px-4 py-2 bg-blue-500 rounded">
           Login
         </button>
       </form>
-
-      <p>
-        Don't have an account?{" "}
-        <button
-          onClick={() => navigate("/register")}
-          className="text-blue-400 hover:underline"
-        >
-          Register
-        </button>
-      </p>
+      {error && <p className="text-red-500 mt-4">{error}</p>}
     </div>
   );
 };
