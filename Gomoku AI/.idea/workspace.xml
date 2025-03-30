@@ -5,14 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="58b729f7-b168-4c5f-9d3c-ea02e414aa1a" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/ai/create_ppo_model.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ai/get_ai_move.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ai/gomoku_env.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ai/train_ai.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/ai/get_ai_move.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/ai/gomoku_ppo.zip" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/ai/train_ai.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/src/main/java/com/btec/gomoku_game/controllers/AIController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gomoku_dqn.h5" beforeDir="false" afterPath="$PROJECT_DIR$/gomoku_dqn.h5" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/src/main/java/com/btec/gomoku_game/controllers/GameRoomController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/src/main/java/com/btec/gomoku_game/controllers/GameRoomController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/src/main/java/com/btec/gomoku_game/services/GameRoomService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/src/main/java/com/btec/gomoku_game/services/GameRoomService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Gomoku frontend/Gomoku/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/../Gomoku frontend/Gomoku/src/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Gomoku frontend/Gomoku/src/pages/GameLobby.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../Gomoku frontend/Gomoku/src/pages/GameLobby.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Gomoku frontend/Gomoku/src/pages/Login.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../Gomoku frontend/Gomoku/src/pages/Login.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Gomoku frontend/Gomoku/src/pages/PlayOnline.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../Gomoku frontend/Gomoku/src/pages/PlayOnline.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ai_move.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gomoku_dqn.h5" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gomoku_dqn.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/src/main/java/com/btec/gomoku_game/configs/WebSocketGameHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/src/main/java/com/btec/gomoku_game/configs/WebSocketGameHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Gomoku frontend/Gomoku/src/pages/PlayWithAI.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../Gomoku frontend/Gomoku/src/pages/PlayWithAI.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -48,9 +54,11 @@
   &quot;keyToString&quot;: {
     &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;Python.GomokuEnv.executor&quot;: &quot;Run&quot;,
+    &quot;Python.get_ai_move.executor&quot;: &quot;Run&quot;,
     &quot;Python.gomoku_dqn.executor&quot;: &quot;Run&quot;,
     &quot;Python.main.executor&quot;: &quot;Run&quot;,
     &quot;Python.server.executor&quot;: &quot;Run&quot;,
+    &quot;Python.train_ai.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;AI&quot;,
@@ -64,7 +72,34 @@
       <ReportDescription localRun="true" path="C:\Users\Thanh\AppData\Local\Temp\qodana_output\qodana.sarif.json" reportGuid="9bfc5af3-8a8e-4c9b-bdd9-e43a9b5cc1e5" reportId="Gomoku AI/qodana/2025-03-20" />
     </option>
   </component>
-  <component name="RunManager" selected="Python.gomoku_dqn">
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\BTEC\Game Gomoku\Gomoku-game\Gomoku AI\ai" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.get_ai_move">
+    <configuration name="get_ai_move" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Gomoku AI" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ai" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ai/get_ai_move.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="gomoku_dqn" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Gomoku AI" />
       <option name="ENV_FILES" value="" />
@@ -109,8 +144,32 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="train_ai" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Gomoku AI" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/ai" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/ai/train_ai.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.get_ai_move" />
+        <item itemvalue="Python.train_ai" />
         <item itemvalue="Python.gomoku_dqn" />
       </list>
     </recent_temporary>
