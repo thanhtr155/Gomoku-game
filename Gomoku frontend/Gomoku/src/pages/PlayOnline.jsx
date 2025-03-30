@@ -18,7 +18,7 @@ const PlayOnline = () => {
   const [winner, setWinner] = useState(null);
   const [player1, setPlayer1] = useState(null);
   const [player2, setPlayer2] = useState(null);
-  const [messages, setMessages] = useState([]); // Lưu tin nhắn dưới dạng object { sender, content, timestamp }
+  const [messages, setMessages] = useState([]);
   const [chatInput, setChatInput] = useState("");
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState(null);
@@ -68,12 +68,12 @@ const PlayOnline = () => {
 
         const gameState = await response.json();
         console.log("Fetched room state:", gameState);
-        setBoard(gameState.board);
-        setCurrentTurn(gameState.currentTurn);
-        setWinner(gameState.winner);
-        setPlayer1(gameState.player1);
-        setPlayer2(gameState.player2);
-        setIsGameFinished(gameState.finished);
+        setBoard(gameState.board || Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill("")));
+        setCurrentTurn(gameState.currentTurn || "X");
+        setWinner(gameState.winner || null);
+        setPlayer1(gameState.player1 || null);
+        setPlayer2(gameState.player2 || null);
+        setIsGameFinished(gameState.finished || false);
         setIsLoading(false);
         setRematchRequested(gameState.player1 === player ? gameState.player1WantsRematch : gameState.player2WantsRematch);
         setRematchRequestFrom(
@@ -97,13 +97,33 @@ const PlayOnline = () => {
         stompClient.subscribe(`/topic/game/${roomId}`, (message) => {
           const gameState = JSON.parse(message.body);
           console.log("Received game state:", gameState);
-          setBoard(gameState.board);
-          setCurrentTurn(gameState.currentTurn);
-          setWinner(gameState.winner);
-          setPlayer1(gameState.player1);
-          setPlayer2(gameState.player2);
-          setIsGameFinished(gameState.finished);
+
+          // Kiểm tra nếu gameState là ErrorMessage
+          if (gameState.message) {
+            setNotification(gameState.message);
+            setTimeout(() => {
+              navigate("/lobby");
+            }, 2000);
+            return;
+          }
+
+          // Nếu không phải ErrorMessage, cập nhật trạng thái game
+          setBoard(gameState.board || Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill("")));
+          setCurrentTurn(gameState.currentTurn || "X");
+          setWinner(gameState.winner || null);
+          setPlayer1(gameState.player1 || null);
+          setPlayer2(gameState.player2 || null);
+          setIsGameFinished(gameState.finished || false);
           setIsLoading(false);
+
+          // Kiểm tra nếu player1 rời phòng (dự phòng)
+          if (!gameState.player1 && gameState.player2 === player) {
+            setNotification("Room creator has left. Returning to lobby...");
+            setTimeout(() => {
+              navigate("/lobby");
+            }, 2000);
+            return;
+          }
 
           // Cập nhật trạng thái rematch
           const isPlayer1 = gameState.player1 === player;
@@ -111,7 +131,7 @@ const PlayOnline = () => {
           const otherPlayerWantsRematch = isPlayer1 ? gameState.player2WantsRematch : gameState.player1WantsRematch;
           const otherPlayerEmail = isPlayer1 ? gameState.player2 : gameState.player1;
 
-          setRematchRequested(playerWantsRematch);
+          setRematchRequested(playerWantsRematch || false);
           setRematchRequestFrom(
             otherPlayerWantsRematch && otherPlayerEmail !== player ? otherPlayerEmail : null
           );
@@ -123,7 +143,7 @@ const PlayOnline = () => {
             setTimeout(() => {
               navigate("/lobby");
             }, 2000);
-            return; // Thoát ngay để không thực thi các điều kiện khác
+            return;
           }
 
           // Nếu cả hai người chơi đồng ý rematch, reset trạng thái và thông báo
@@ -144,18 +164,16 @@ const PlayOnline = () => {
           }
         });
 
-        // Subscription cho tin nhắn chat
         stompClient.subscribe(`/topic/game/${roomId}/chat`, (message) => {
           const chatMessage = JSON.parse(message.body);
           console.log("Received chat message:", chatMessage);
-          // Chỉ thêm tin nhắn nếu nó không phải từ người gửi
           if (chatMessage.sender !== player) {
             setMessages((prev) => [
               ...prev,
               {
                 sender: chatMessage.sender,
                 content: chatMessage.content,
-                timestamp: new Date().toLocaleTimeString(), // Thêm thời gian gửi
+                timestamp: new Date().toLocaleTimeString(),
               },
             ]);
           }
@@ -213,7 +231,6 @@ const PlayOnline = () => {
     if (!client || !chatInput.trim()) return;
 
     console.log(`Sending chat: ${player}: ${chatInput}`);
-    // Hiển thị tin nhắn ngay lập tức trên giao diện của người gửi
     const timestamp = new Date().toLocaleTimeString();
     setMessages((prev) => [
       ...prev,
@@ -336,39 +353,43 @@ const PlayOnline = () => {
         </div>
       )}
 
-      <div
-        className="grid gap-1 mt-4"
-        style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${BOARD_SIZE}, 1fr)`,
-          gridTemplateRows: `repeat(${BOARD_SIZE}, 1fr)`,
-          border: "2px solid white",
-        }}
-      >
-        {board.map((row, rIdx) =>
-          row.map((cell, cIdx) => (
-            <button
-              key={`${rIdx}-${cIdx}`}
-              onClick={() => sendMove(rIdx, cIdx)}
-              className={`w-8 h-8 border flex items-center justify-center ${
-                cell === "X"
-                  ? "bg-blue-500 text-white"
-                  : cell === "O"
-                  ? "bg-red-500 text-white"
-                  : "bg-gray-800 hover:bg-gray-700"
-              }`}
-              disabled={
-                winner ||
-                !player1 ||
-                !player2 ||
-                (player === player1 ? currentTurn !== "X" : currentTurn !== "O")
-              }
-            >
-              {cell || ""}
-            </button>
-          ))
-        )}
-      </div>
+      {board && Array.isArray(board) ? (
+        <div
+          className="grid gap-1 mt-4"
+          style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${BOARD_SIZE}, 1fr)`,
+            gridTemplateRows: `repeat(${BOARD_SIZE}, 1fr)`,
+            border: "2px solid white",
+          }}
+        >
+          {board.map((row, rIdx) =>
+            row.map((cell, cIdx) => (
+              <button
+                key={`${rIdx}-${cIdx}`}
+                onClick={() => sendMove(rIdx, cIdx)}
+                className={`w-8 h-8 border flex items-center justify-center ${
+                  cell === "X"
+                    ? "bg-blue-500 text-white"
+                    : cell === "O"
+                    ? "bg-red-500 text-white"
+                    : "bg-gray-800 hover:bg-gray-700"
+                }`}
+                disabled={
+                  winner ||
+                  !player1 ||
+                  !player2 ||
+                  (player === player1 ? currentTurn !== "X" : currentTurn !== "O")
+                }
+              >
+                {cell || ""}
+              </button>
+            ))
+          )}
+        </div>
+      ) : (
+        <p className="text-red-500 mt-4">Error: Game board is not available.</p>
+      )}
 
       <div className="mt-6 w-1/2">
         <h3 className="text-xl font-bold">Chat</h3>

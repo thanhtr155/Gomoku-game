@@ -266,29 +266,31 @@ public class WebSocketGameHandler {
         if (gameRoomOptional.isPresent()) {
             GameRoom gameRoom = gameRoomOptional.get();
             if (gameRoom.isFinished()) {
-                // Nếu trò chơi đã kết thúc, xóa phòng ngay lập tức
                 gameRoomService.deleteGameRoom(roomId);
                 logger.info("Room {} deleted as game is finished and player {} left", roomId, request.getPlayerEmail());
                 messagingTemplate.convertAndSend("/topic/game/" + roomId, new ErrorMessage("Game finished - room deleted"));
                 return;
             }
-            if (request.getPlayerEmail().equals(gameRoom.getPlayer1())) {
-                gameRoom.setPlayer1(null);
+            boolean isPlayer1 = request.getPlayerEmail().equals(gameRoom.getPlayer1());
+            if (isPlayer1) {
+                // Nếu player1 rời, xóa phòng ngay lập tức
+                gameRoomService.deleteGameRoom(roomId);
+                logger.info("Room {} deleted as creator (player1) {} left", roomId, request.getPlayerEmail());
+                messagingTemplate.convertAndSend("/topic/game/" + roomId, new ErrorMessage("Room closed by creator"));
             } else if (request.getPlayerEmail().equals(gameRoom.getPlayer2())) {
                 gameRoom.setPlayer2(null);
+                if (gameRoom.getPlayer1() == null) {
+                    gameRoomService.deleteGameRoom(roomId);
+                    logger.info("Room {} deleted as both players left", roomId);
+                    messagingTemplate.convertAndSend("/topic/game/" + roomId, new ErrorMessage("Room deleted as both players left"));
+                } else {
+                    gameRoomService.saveGameRoom(gameRoom);
+                    logger.info("Updated room state after player2 {} left: {}", request.getPlayerEmail(), gameRoom);
+                    messagingTemplate.convertAndSend("/topic/game/" + roomId, gameRoom);
+                }
             } else {
                 logger.warn("Player {} not in room {}", request.getPlayerEmail(), roomId);
                 messagingTemplate.convertAndSend("/topic/game/" + roomId, new ErrorMessage("Player not in room"));
-                return;
-            }
-            if (gameRoom.getPlayer1() == null && gameRoom.getPlayer2() == null) {
-                gameRoomService.deleteGameRoom(roomId);
-                logger.info("Room {} deleted as both players left", roomId);
-                messagingTemplate.convertAndSend("/topic/game/" + roomId, new ErrorMessage("Room deleted as both players left"));
-            } else {
-                gameRoomService.saveGameRoom(gameRoom);
-                logger.info("Updated room state after player {} left: {}", request.getPlayerEmail(), gameRoom);
-                messagingTemplate.convertAndSend("/topic/game/" + roomId, gameRoom);
             }
         } else {
             logger.warn("Room not found: {}", roomId);

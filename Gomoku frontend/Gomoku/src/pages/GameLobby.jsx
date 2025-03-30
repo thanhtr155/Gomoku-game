@@ -7,22 +7,39 @@ const GameLobby = () => {
   const [message, setMessage] = useState("");
   const [playerEmail, setPlayerEmail] = useState(null);
   const [availableRooms, setAvailableRooms] = useState([]);
+  const [token, setToken] = useState(null); // Lưu token để sử dụng trong interval
 
   useEffect(() => {
     const email = localStorage.getItem("userEmail");
-    const token = localStorage.getItem("token");
+    const tokenFromStorage = localStorage.getItem("token");
     console.log("GameLobby: Checking localStorage:");
     console.log("userEmail:", email);
-    console.log("token:", token);
+    console.log("token:", tokenFromStorage);
 
-    if (!email || !token) {
+    if (!email || !tokenFromStorage) {
       console.log("No email or token found, redirecting to /login");
       navigate("/login");
-    } else {
-      setPlayerEmail(email);
-      fetchAvailableRooms(token);
+      return;
     }
-  }, [navigate]);
+
+    setPlayerEmail(email);
+    setToken(tokenFromStorage);
+
+    // Gọi lần đầu tiên ngay khi component mount
+    fetchAvailableRooms(tokenFromStorage);
+
+    // Thiết lập interval để cập nhật danh sách phòng mỗi 2 giây
+    const intervalId = setInterval(() => {
+      console.log("Fetching available rooms every 2 seconds...");
+      fetchAvailableRooms(tokenFromStorage);
+    }, 2000);
+
+    // Dọn dẹp interval khi component unmount
+    return () => {
+      console.log("Cleaning up interval...");
+      clearInterval(intervalId);
+    };
+  }, [navigate]); // Dependency chỉ có navigate vì token không thay đổi trong component này
 
   const fetchAvailableRooms = async (token) => {
     try {
@@ -59,7 +76,6 @@ const GameLobby = () => {
 
     const newRoomId = "room-" + Math.floor(Math.random() * 10000);
     try {
-      const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("No token found. Please log in again.");
       }
@@ -97,7 +113,6 @@ const GameLobby = () => {
     }
 
     try {
-      const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("No token found. Please log in again.");
       }
