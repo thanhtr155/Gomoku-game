@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function App() {
  const navigate = useNavigate();
- const size = 10;
+ const size = 15;
  const [board, setBoard] = useState(Array(size * size).fill(null));
  const [isXNext, setIsXNext] = useState(true);
  const winner = calculateWinner(board, size);
@@ -60,39 +60,67 @@ export default function App() {
  }
 
  return (
- <div 
- className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white"
- style={{ backgroundImage: "url('https://img6.thuthuatphanmem.vn/uploads/2022/03/16/background-den-led-chuyen-sac_085304512.jpg')", backgroundSize: 'cover', backgroundPosition: 'center' }}
- >
- <h1 className="text-3xl font-bold mb-4">Gomoku</h1>
- <div
- className="grid gap-1 p-2 bg-gray-900 bg-opacity-70 rounded-lg"
- style={{ gridTemplateColumns: `repeat(${size}, 1fr)` }}
- >
- {board.map((cell, index) => (
- <button
- key={index}
- onClick={() => handleClick(index)}
- className="w-10 h-10 text-lg font-bold flex items-center justify-center bg-gray-800 border border-gray-600 rounded-lg hover:bg-gray-700"
- >
- {cell}
- </button>
- ))}
- </div>
- {winner && <p className="mt-4 text-xl font-semibold">{winner} Wins!</p>}
- {isDraw && <p className="mt-4 text-xl font-semibold">It’s a Draw!</p>}
- <button
- onClick={resetGame}
- className="mt-4 px-4 py-2 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600"
- >
- Reset Game
- </button>
- <button
- onClick={() => navigate("/main")}
- className="px-6 py-2 mt-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600"
- >
- Back
- </button>
- </div>
- );
+    <div className="flex flex-col items-center justify-center min-h-screen bg-cover bg-center text-white p-6" style={{ backgroundImage: `url('https://img6.thuthuatphanmem.vn/uploads/2022/03/16/background-den-led-chuyen-sac_085304512.jpg')` }}>
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 to-blue-900/50 animate-gradient-shift"></div>
+      <div className="relative z-10 flex flex-col items-center">
+        <h1 className="text-5xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-600 animate-text-glow">
+          Gomoku Offline
+        </h1>
+        <div
+          className="grid gap-1 p-6 bg-gray-800/80 rounded-xl shadow-2xl animate-fade-slide-up"
+          style={{ gridTemplateColumns: `repeat(${size}, 1fr)` }}
+        >
+          {board.map((cell, index) => (
+            <button
+              key={index}
+              onClick={() => handleClick(index)}
+              className={`w-12 h-12 text-2xl font-bold flex items-center justify-center rounded-md shadow-lg transition-all duration-300 transform hover:scale-110 ${
+                cell === "X"
+                  ? "bg-blue-600 text-white animate-pulse"
+                  : cell === "O"
+                  ? "bg-red-600 text-white animate-pulse"
+                  : "bg-gray-700 hover:bg-gray-600 animate-bounce-in"
+              }`}
+            >
+              {cell}
+            </button>
+          ))}
+        </div>
+        {winner && (
+          <p className="mt-6 text-3xl font-semibold text-green-400 animate-text-reveal text-center">
+            {winner} Wins!
+          </p>
+        )}
+        {isDraw && (
+          <p className="mt-6 text-3xl font-semibold text-yellow-400 animate-text-reveal text-center">
+            It’s a Draw!
+          </p>
+        )}
+        <div className="flex justify-center space-x-4 mt-8">
+          <button
+            onClick={resetGame}
+            className="relative px-8 py-3 bg-gradient-to-r from-red-500 to-pink-600 rounded-lg shadow-xl hover:from-red-600 hover:to-pink-700 transform hover:scale-110 hover:rotate-2 transition-all duration-500 group overflow-hidden"
+          >
+            <span className="relative z-10">Reset Game</span>
+            <span className="absolute inset-0 bg-red-400 opacity-0 group-hover:opacity-40 animate-pulse transition-opacity duration-500"></span>
+          </button>
+          <button
+            onClick={() => navigate("/main")}
+            className="relative px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-xl hover:from-blue-600 hover:to-indigo-700 transform hover:scale-110 hover:rotate-2 transition-all duration-500 group overflow-hidden"
+          >
+            <span className="relative z-10">Back</span>
+            <span className="absolute inset-0 bg-blue-400 opacity-0 group-hover:opacity-40 animate-pulse transition-opacity duration-500"></span>
+          </button>
+        </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes gradient-shift { ... }
+        @keyframes text-glow { ... }
+        @keyframes bounce-in { ... }
+        @keyframes fade-slide-up { ... }
+        @keyframes text-reveal { ... }
+      `}</style>
+    </div>
+  );
 }

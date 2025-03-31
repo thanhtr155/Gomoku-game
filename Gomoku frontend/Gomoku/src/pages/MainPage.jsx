@@ -25,7 +25,7 @@ const MainPage = () => {
   }, [navigate]);
 
   const handleLogout = () => {
-    logoutUser(); // Gọi hàm logoutUser từ authService
+    logoutUser();
     setIsLoggedIn(false);
     setUserEmail(null);
     navigate("/login");
@@ -53,45 +53,98 @@ const MainPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
-      <h1 className="text-3xl font-bold mb-6">Welcome to Gomoku Game</h1>
-      {isLoggedIn && userEmail && (
-        <p className="mb-4">Logged in as: <strong>{userEmail}</strong></p>
-      )}
-      <div className="flex flex-col space-y-4">
-        <button
-          onClick={handlePlayOffline}
-          className="px-6 py-2 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600"
-        >
-          Play Offline
-        </button>
-        <button
-          onClick={handlePlayOnline}
-          className="px-6 py-2 bg-yellow-500 text-white font-bold rounded-lg hover:bg-yellow-600"
-        >
-          Play Online
-        </button>
-        <button
-          onClick={handlePlayWithAI}
-          className="px-6 py-2 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600"
-        >
-          Play With AI
-        </button>
-        <button
-          onClick={handleRules}
-          className="px-6 py-2 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-600"
-        >
-          How to Play Gomoku Game
-        </button>
-        {isLoggedIn && (
-          <button
-            onClick={handleLogout}
-            className="px-6 py-2 bg-gray-500 text-white font-bold rounded-lg hover:bg-gray-600"
-          >
-            Logout
-          </button>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-cover bg-center text-white p-6" style={{ backgroundImage: `url('https://img6.thuthuatphanmem.vn/uploads/2022/03/16/background-den-led-chuyen-sac_085304512.jpg')` }}>
+      <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-gray-800/50 animate-gradient-shift"></div>
+      <div className="relative z-10 flex flex-col items-center">
+        <h1 className="text-5xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 animate-text-glow">
+          Welcome to Gomoku Game
+        </h1>
+        {isLoggedIn && userEmail && (
+          <p className="mb-6 text-lg text-gray-200 animate-text-reveal text-center">
+            Logged in as: <strong className="text-teal-400">{userEmail}</strong>
+          </p>
         )}
+        <div className="flex flex-col space-y-6 w-full max-w-sm items-center">
+          <button
+            onClick={handlePlayOffline}
+            className="relative w-full px-8 py-4 bg-gradient-to-r from-green-500 to-teal-600 rounded-lg shadow-xl hover:from-green-600 hover:to-teal-700 transform hover:scale-110 hover:rotate-2 transition-all duration-500 group overflow-hidden animate-bounce-in"
+          >
+            <span className="relative z-10">Play Offline</span>
+            <span className="absolute inset-0 bg-green-400 opacity-0 group-hover:opacity-40 animate-pulse transition-opacity duration-500"></span>
+          </button>
+          <button
+            onClick={handlePlayOnline}
+            className="relative w-full px-8 py-4 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-lg shadow-xl hover:from-yellow-600 hover:to-orange-700 transform hover:scale-110 hover:rotate-2 transition-all duration-500 group overflow-hidden animate-bounce-in"
+          >
+            <span className="relative z-10">Play Online</span>
+            <span className="absolute inset-0 bg-yellow-400 opacity-0 group-hover:opacity-40 animate-pulse transition-opacity duration-500"></span>
+          </button>
+          <button
+            onClick={handlePlayWithAI}
+            className="relative w-full px-8 py-4 bg-gradient-to-r from-red-500 to-pink-600 rounded-lg shadow-xl hover:from-red-600 hover:to-pink-700 transform hover:scale-110 hover:rotate-2 transition-all duration-500 group overflow-hidden animate-bounce-in"
+          >
+            <span className="relative z-10">Play With AI</span>
+            <span className="absolute inset-0 bg-red-400 opacity-0 group-hover:opacity-40 animate-pulse transition-opacity duration-500"></span>
+          </button>
+          <button
+            onClick={handleRules}
+            className="relative w-full px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-xl hover:from-blue-600 hover:to-indigo-700 transform hover:scale-110 hover:rotate-2 transition-all duration-500 group overflow-hidden animate-bounce-in"
+          >
+            <span className="relative z-10">How to Play Gomoku Game</span>
+            <span className="absolute inset-0 bg-blue-400 opacity-0 group-hover:opacity-40 animate-pulse transition-opacity duration-500"></span>
+          </button>
+          {isLoggedIn && (
+            <button
+              onClick={handleLogout}
+              className="relative w-full px-8 py-4 bg-gradient-to-r from-gray-600 to-gray-700 rounded-lg shadow-xl hover:from-gray-700 hover:to-gray-800 transform hover:scale-110 hover:rotate-2 transition-all duration-500 group overflow-hidden animate-bounce-in"
+            >
+              <span className="relative z-10">Logout</span>
+              <span className="absolute inset-0 bg-gray-500 opacity-0 group-hover:opacity-40 animate-pulse transition-opacity duration-500"></span>
+            </button>
+          )}
+        </div>
       </div>
+
+      <style jsx>{`
+        @keyframes gradient-shift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes text-glow {
+          0%, 100% { text-shadow: 0 0 10px rgba(96, 165, 250, 0.8); }
+          50% { text-shadow: 0 0 20px rgba(147, 51, 234, 1); }
+        }
+        @keyframes bounce-in {
+          0% { transform: scale(0.3); opacity: 0; }
+          60% { transform: scale(1.2); opacity: 1; }
+          100% { transform: scale(1); }
+        }
+        @keyframes fade-slide-up {
+          0% { opacity: 0; transform: translateY(20px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes text-reveal {
+          0% { opacity: 0; filter: blur(5px); }
+          100% { opacity: 1; filter: blur(0); }
+        }
+        .animate-gradient-shift {
+          background-size: 200% 200%;
+          animation: gradient-shift 15s ease infinite;
+        }
+        .animate-text-glow {
+          animation: text-glow 2s ease-in-out infinite;
+        }
+        .animate-bounce-in {
+          animation: bounce-in 0.8s ease-out;
+        }
+        .animate-fade-slide-up {
+          animation: fade-slide-up 0.8s ease-out;
+        }
+        .animate-text-reveal {
+          animation: text-reveal 1s ease-out;
+        }
+      `}</style>
     </div>
   );
 };
