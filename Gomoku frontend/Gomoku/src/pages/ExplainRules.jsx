@@ -135,7 +135,7 @@ const ExplainRules = () => {
   const [language, setLanguage] = useState("en");
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-cover bg-center text-white p-6" style={{ backgroundImage: `url('https://img6.thuthuatphanmem.vn/uploads/2022/03/16/background-den-led-chuyen-sac_085304512.jpg')` }}>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-cover bg-center text-white p-6" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80')` }}>
       <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-gray-800/60 to-black/50 animate-gradient-shift"></div>
       <div className="relative z-10 flex flex-col items-center">
         <h1 className="text-5xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 animate-text-glow">

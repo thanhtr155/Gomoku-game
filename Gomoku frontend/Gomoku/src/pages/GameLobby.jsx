@@ -139,7 +139,7 @@
     };
 
     return (
-      <div className="flex flex-col items-center min-h-screen bg-cover bg-center text-white p-6" style={{ backgroundImage: `url('https://img6.thuthuatphanmem.vn/uploads/2022/03/16/background-den-led-chuyen-sac_085304512.jpg')` }}>
+      <div className="flex flex-col items-center min-h-screen bg-cover bg-center text-white p-6" style={{ backgroundImage: `url('https://cdnb.artstation.com/p/assets/images/images/034/591/187/large/yurinatume-.jpg?1612711740')` }}>
       <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 to-gray-800/50 animate-gradient-shift"></div>
       <div className="relative z-10 flex flex-col items-center">
         <h1 className="text-5xl font-extrabold my-6 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-teal-600 animate-text-glow">
