@@ -98,7 +98,6 @@ const PlayOnline = () => {
           const gameState = JSON.parse(message.body);
           console.log("Received game state:", gameState);
 
-          // Kiểm tra nếu gameState là ErrorMessage
           if (gameState.message) {
             setNotification(gameState.message);
             setTimeout(() => {
@@ -107,7 +106,6 @@ const PlayOnline = () => {
             return;
           }
 
-          // Nếu không phải ErrorMessage, cập nhật trạng thái game
           setBoard(gameState.board || Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill("")));
           setCurrentTurn(gameState.currentTurn || "X");
           setWinner(gameState.winner || null);
@@ -116,7 +114,6 @@ const PlayOnline = () => {
           setIsGameFinished(gameState.finished || false);
           setIsLoading(false);
 
-          // Kiểm tra nếu player1 rời phòng (player1 = null)
           if (gameState.player1 === null && gameState.player2 !== null) {
             setNotification("The room creator has left. Returning to lobby...");
             setTimeout(() => {
@@ -125,7 +122,6 @@ const PlayOnline = () => {
             return;
           }
 
-          // Cập nhật trạng thái rematch
           const isPlayer1 = gameState.player1 === player;
           const playerWantsRematch = isPlayer1 ? gameState.player1WantsRematch : gameState.player2WantsRematch;
           const otherPlayerWantsRematch = isPlayer1 ? gameState.player2WantsRematch : gameState.player1WantsRematch;
@@ -136,7 +132,6 @@ const PlayOnline = () => {
             otherPlayerWantsRematch && otherPlayerEmail !== player ? otherPlayerEmail : null
           );
 
-          // Nếu một trong hai người từ chối rematch, hiển thị thông báo và quay lại lobby
           if (gameState.rematchDeclined) {
             setRematchDeclined(true);
             setNotification("Rematch declined. Returning to lobby...");
@@ -146,20 +141,15 @@ const PlayOnline = () => {
             return;
           }
 
-          // Nếu cả hai người chơi đồng ý rematch, reset trạng thái và thông báo
           if (gameState.player1WantsRematch && gameState.player2WantsRematch) {
             setRematchRequested(false);
             setRematchRequestFrom(null);
             setRematchDeclined(false);
             setNotification("Starting a new game!");
             setWinner(null);
-          }
-          // Nếu ván đấu chưa kết thúc, xóa thông báo rematch
-          else if (!gameState.finished) {
+          } else if (!gameState.finished) {
             setNotification(null);
-          }
-          // Nếu đang chờ phản hồi rematch và ván đấu đã kết thúc
-          else if (playerWantsRematch && !otherPlayerWantsRematch && gameState.finished) {
+          } else if (playerWantsRematch && !otherPlayerWantsRematch && gameState.finished) {
             setNotification("Waiting for the other player to respond...");
           }
         });
@@ -306,28 +296,36 @@ const PlayOnline = () => {
   }
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-cover bg-center text-white p-6" style={{ backgroundImage: `url('https://img6.thuthuatphanmem.vn/uploads/2022/03/16/background-den-led-chuyen-sac_085304512.jpg')` }}>
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 to-indigo-900/50 animate-gradient-shift"></div>
+    <div
+      className="flex flex-col items-center min-h-screen bg-cover bg-center text-white p-6"
+      style={{ backgroundImage: `url('https://img4.thuthuatphanmem.vn/uploads/2020/12/26/anh-nen-nhat-ban-2k_125909478.jpg')` }}
+    >
       <div className="relative z-10 flex flex-col items-center">
-        <h1 className="text-5xl font-extrabold my-6 text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-600 animate-text-glow">
+        <h1 className="text-5xl font-extrabold my-6 text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-600 animate-text-glow">
           Gomoku - Room
         </h1>
-        <h2 className="text-gray-300 animate-text-reveal text-center">Code "{roomId}" - Share code with your friends</h2>
-        <p className="text-lg text-teal-300 animate-text-reveal text-center">
+        <h2 className="text-lg font-bold text-gray-800 animate-text-reveal text-center">
+          Code "{roomId}" - Share code with your friends
+        </h2>
+        <p className="text-xl font-bold text-blue-800 animate-text-reveal text-center">
           You are: <strong>{player}</strong> (
           {player === player1 ? "X" : player === player2 ? "O" : "Loading..."})
         </p>
-        <p className="text-lg text-gray-300 animate-text-reveal text-center">
+        <p className="text-xl font-bold text-gray-900 animate-text-reveal text-center">
           Players: <strong>{player1 || "Waiting..."}</strong> (X) vs{" "}
           <strong>{player2 || "Waiting..."}</strong> (O)
         </p>
-        <p className="text-lg text-yellow-300 animate-text-reveal text-center">
+        <p className="text-xl font-bold text-orange-800 animate-text-reveal text-center">
           Current Turn: <strong>{currentTurn}</strong>
         </p>
         {winner && (
-          <p className="text-3xl mt-6 text-green-400 animate-text-reveal text-center">Winner: {winner}</p>
+          <p className="text-3xl mt-6 text-green-400 animate-text-reveal text-center">
+            Winner: {winner}
+          </p>
         )}
-        {error && <p className="text-red-400 mt-6 animate-text-reveal text-center">{error}</p>}
+        {error && (
+          <p className="text-red-400 mt-6 animate-text-reveal text-center">{error}</p>
+        )}
         {notification && (
           <p className="text-yellow-400 mt-6 animate-text-reveal text-center">{notification}</p>
         )}
@@ -402,11 +400,15 @@ const PlayOnline = () => {
             )}
           </div>
         ) : (
-          <p className="text-red-400 mt-6 animate-text-reveal text-center">Error: Game board is not available.</p>
+          <p className="text-red-400 mt-6 animate-text-reveal text-center">
+            Error: Game board is not available.
+          </p>
         )}
 
         <div className="mt-8 w-full max-w-md animate-fade-slide-up flex flex-col items-center">
-          <h3 className="text-2xl font-bold text-teal-400 animate-text-reveal text-center">Chat</h3>
+          <h3 className="text-2xl font-bold text-teal-400 animate-text-reveal text-center">
+            Chat
+          </h3>
           <div className="h-40 bg-gray-800/80 p-4 rounded-xl shadow-lg overflow-y-auto w-full">
             {messages.map((msg, idx) => (
               <p
@@ -452,11 +454,41 @@ const PlayOnline = () => {
       </div>
 
       <style jsx>{`
-        @keyframes gradient-shift { ... }
-        @keyframes text-glow { ... }
-        @keyframes bounce-in { ... }
-        @keyframes fade-slide-up { ... }
-        @keyframes text-reveal { ... }
+        @keyframes gradient-shift {
+          0% { background-position: 0% 0%; }
+          50% { background-position: 100% 100%; }
+          100% { background-position: 0% 0%; }
+        }
+        @keyframes text-glow {
+          0% { text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 10px rgba(255, 255, 255, 0.3); }
+          50% { text-shadow: 0 0 15px rgba(255, 255, 255, 1), 0 0 25px rgba(255, 255, 255, 0.8); }
+          100% { text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 10px rgba(255, 255, 255, 0.3); }
+        }
+        @keyframes bounce-in {
+          0% { transform: scale(0.8); opacity: 0; }
+          50% { transform: scale(1.1); opacity: 1; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes fade-slide-up {
+          0% { opacity: 0; transform: translateY(20px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes text-reveal {
+          0% { opacity: 0; filter: blur(3px); transform: translateY(10px); }
+          100% { opacity: 1; filter: blur(0); transform: translateY(0); }
+        }
+        .animate-text-glow {
+          animation: text-glow 3s ease-in-out infinite;
+        }
+        .animate-bounce-in {
+          animation: bounce-in 0.6s ease-out;
+        }
+        .animate-fade-slide-up {
+          animation: fade-slide-up 0.8s ease-out;
+        }
+        .animate-text-reveal {
+          animation: text-reveal 0.7s ease-out;
+        }
       `}</style>
     </div>
   );

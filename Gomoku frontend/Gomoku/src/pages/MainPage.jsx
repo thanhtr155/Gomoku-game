@@ -53,7 +53,7 @@ const MainPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-cover bg-center text-white p-6" style={{ backgroundImage: `url('https://img6.thuthuatphanmem.vn/uploads/2022/03/16/background-den-led-chuyen-sac_085304512.jpg')` }}>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-cover bg-center text-white p-6" style={{ backgroundImage: `url('https://wallpaperaccess.com/full/2346357.jpg')` }}>
       <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-gray-800/50 animate-gradient-shift"></div>
       <div className="relative z-10 flex flex-col items-center">
         <h1 className="text-5xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 animate-text-glow">

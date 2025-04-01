@@ -39,7 +39,7 @@ const Register = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-cover bg-center text-white p-6" style={{ backgroundImage: `url('https://img6.thuthuatphanmem.vn/uploads/2022/03/16/background-den-led-chuyen-sac_085304512.jpg')` }}>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-cover bg-center text-white p-6" style={{ backgroundImage: `url('https://wallpaperaccess.com/full/40409.jpg')` }}>
       <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 to-teal-900/50 animate-gradient-shift"></div>
       <div className="relative z-10 flex flex-col items-center">
         <h1 className="text-5xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-green-600 animate-text-glow">
