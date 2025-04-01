@@ -5,21 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="58b729f7-b168-4c5f-9d3c-ea02e414aa1a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/ai/create_ppo_model.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ai/get_ai_move.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ai/gomoku_env.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ai/train_ai.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/ai/get_ai_move.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/ai/gomoku_ppo.zip" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/ai/train_ai.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/src/main/java/com/btec/gomoku_game/controllers/AIController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/qodana.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ai_move.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gomoku_dqn.h5" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gomoku_dqn.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/src/main/java/com/btec/gomoku_game/configs/WebSocketGameHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/src/main/java/com/btec/gomoku_game/configs/WebSocketGameHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Gomoku frontend/Gomoku/src/pages/PlayWithAI.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../Gomoku frontend/Gomoku/src/pages/PlayWithAI.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,15 +48,15 @@
     &quot;Python.train_ai.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;AI&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/python projects/ASM&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+    &quot;last_opened_file_path&quot;: &quot;E:/ASM GOMOKU/Gomoku-game/Gomoku AI&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.qodana&quot;
   }
 }</component>
   <component name="QodanaReportsService">
     <option name="descriptions">
-      <ReportDescription localRun="true" path="C:\Users\Thanh\AppData\Local\Temp\qodana_output\qodana.sarif.json" reportGuid="9bfc5af3-8a8e-4c9b-bdd9-e43a9b5cc1e5" reportId="Gomoku AI/qodana/2025-03-20" />
+      <ReportDescription localRun="true" path="C:\Users\ADMIN\AppData\Local\Temp\qodana_output\qodana.sarif.json" reportGuid="c7f00c15-d67d-401e-ab32-0061407201aa" reportId="Gomoku AI/qodana/2025-03-30" />
     </option>
   </component>
   <component name="RecentsManager">

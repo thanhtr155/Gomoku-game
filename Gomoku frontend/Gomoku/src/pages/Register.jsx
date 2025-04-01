@@ -39,20 +39,20 @@ const Register = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-900 to-purple-900 text-white">
       <h1 className="text-3xl font-bold mb-6">Register</h1>
-      
+
       {error && <p className="text-red-500 mb-4">{error}</p>}
       {success && <p className="text-green-500 mb-4">{success}</p>}
 
-      <form onSubmit={handleRegister} className="flex flex-col items-center">
+      <form onSubmit={handleRegister} className="bg-white text-black p-6 rounded-lg shadow-lg w-96">
         <input
           type="text"
           name="firstName"
           placeholder="First Name"
           value={user.firstName}
           onChange={handleChange}
-          className="px-4 py-2 mb-4 text-black rounded-lg w-64"
+          className="w-full px-4 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
         />
         <input
           type="text"
@@ -60,7 +60,7 @@ const Register = () => {
           placeholder="Last Name"
           value={user.lastName}
           onChange={handleChange}
-          className="px-4 py-2 mb-4 text-black rounded-lg w-64"
+          className="w-full px-4 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
         />
         <input
           type="email"
@@ -68,7 +68,7 @@ const Register = () => {
           placeholder="Email"
           value={user.email}
           onChange={handleChange}
-          className="px-4 py-2 mb-4 text-black rounded-lg w-64"
+          className="w-full px-4 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
         />
         <input
           type="password"
@@ -76,14 +76,14 @@ const Register = () => {
           placeholder="Password"
           value={user.password}
           onChange={handleChange}
-          className="px-4 py-2 mb-4 text-black rounded-lg w-64"
+          className="w-full px-4 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
         />
         <input
           type="date"
           name="birthDay"
           value={user.birthDay}
           onChange={handleChange}
-          className="px-4 py-2 mb-4 text-black rounded-lg w-64"
+          className="w-full px-4 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
         />
         <input
           type="text"
@@ -91,17 +91,17 @@ const Register = () => {
           placeholder="Address"
           value={user.address}
           onChange={handleChange}
-          className="px-4 py-2 mb-4 text-black rounded-lg w-64"
+          className="w-full px-4 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
         />
         <button
           type="submit"
-          className="px-6 py-2 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 mb-4"
+          className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 transition"
         >
           Register
         </button>
       </form>
 
-      <p>
+      <p className="mt-4">
         Already have an account?{" "}
         <button
           onClick={() => navigate("/login")}
