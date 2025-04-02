@@ -3,6 +3,7 @@ package com.btec.gomoku_game.configs;
 import com.btec.gomoku_game.entities.*;
 import com.btec.gomoku_game.services.GameRoomService;
 import com.btec.gomoku_game.repositories.ChatMessageRepository;
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +12,17 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -38,6 +47,7 @@ public class WebSocketGameHandler {
         public String getMessage() { return message; }
         public void setMessage(String message) { this.message = message; }
     }
+
 
     //    @MessageMapping("/game/move")
     //    public void processMove(GameMove move) throws Exception {
@@ -309,5 +319,4 @@ public class WebSocketGameHandler {
         }
         return true; // Bàn cờ đầy, hòa
     }
-
 }

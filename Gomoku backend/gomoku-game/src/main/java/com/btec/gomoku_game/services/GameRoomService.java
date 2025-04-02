@@ -42,6 +42,8 @@ public class GameRoomService {
         gameHistoryRepository.deleteById(roomId);
     }
 
+    
+
     public GameRoom makeMove(String roomId, int row, int col, String playerSymbol) {
         Optional<GameRoom> roomOptional = getGameById(roomId);
         if (!roomOptional.isPresent()) {
