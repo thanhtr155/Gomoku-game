@@ -13,27 +13,29 @@ const Dashboard = ({ setIsLoggedIn }) => {
   return (
     <div className="min-h-screen flex">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-900 text-white p-6 flex-shrink-0">
-        <h1 className="text-2xl font-extrabold mb-8">Gomoku Admin</h1>
-        <button
-          onClick={() => setActiveTab('users')}
-          className={`w-full text-left py-3 px-4 rounded-lg mb-2 ${
-            activeTab === 'users' ? 'bg-blue-600' : 'hover:bg-gray-700'
-          } transition-all duration-300`}
-        >
-          Users
-        </button>
-        <button
-          onClick={() => setActiveTab('gameRooms')}
-          className={`w-full text-left py-3 px-4 rounded-lg mb-2 ${
-            activeTab === 'gameRooms' ? 'bg-blue-600' : 'hover:bg-gray-700'
-          } transition-all duration-300`}
-        >
-          Game Rooms
-        </button>
+      <div className="w-64 bg-gray-900 text-white p-6 flex flex-col h-screen">
+        <h1 className="text-4xl font-extrabold mb-8">Gomoku Admin</h1>
+        <div className="flex-1">
+          <button
+            onClick={() => setActiveTab('users')}
+            className={`w-full text-left py-3 px-4 rounded-lg mb-2 ${
+              activeTab === 'users' ? 'bg-blue-600' : 'hover:bg-gray-700'
+            } transition-all duration-300`}
+          >
+            Users
+          </button>
+          <button
+            onClick={() => setActiveTab('gameRooms')}
+            className={`w-full text-left py-3 px-4 rounded-lg mb-2 ${
+              activeTab === 'gameRooms' ? 'bg-blue-600' : 'hover:bg-gray-700'
+            } transition-all duration-300`}
+          >
+            Game Rooms
+          </button>
+        </div>
         <button
           onClick={handleLogout}
-          className="w-full text-left py-3 px-4 rounded-lg bg-red-600 hover:bg-red-700 transition-all duration-300 mt-auto"
+          className="w-full text-left py-3 px-4 rounded-lg bg-red-600 hover:bg-red-700 transition-all duration-300"
         >
           Logout
         </button>
