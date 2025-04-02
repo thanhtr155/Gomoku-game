@@ -9,7 +9,7 @@ const UserTab = () => {
   const [userIdToDelete, setUserIdToDelete] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 5;
+  const usersPerPage = 6;
 
   useEffect(() => {
     fetchUsers();
