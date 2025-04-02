@@ -1,7 +1,10 @@
 package com.btec.gomoku_game.controllers;
 
+import com.btec.gomoku_game.entities.Admin;
 import com.btec.gomoku_game.entities.User;
+import com.btec.gomoku_game.repositories.AdminRepository;
 import com.btec.gomoku_game.security.JwtUtil;
+import com.btec.gomoku_game.services.AdminService;
 import com.btec.gomoku_game.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -24,6 +28,9 @@ public class AuthController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AdminService adminService;
 
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -70,5 +77,29 @@ public class AuthController {
         response.put("token", token);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PostMapping("/admin/sign-in")
+    public ResponseEntity<?> adminSignIn(@RequestBody Map<String, String> loginRequest) {
+        String email = loginRequest.get("email");
+        String password = loginRequest.get("password");
+
+        Optional<Admin> adminOpt = adminService.getAdminByEmail(email);
+        if (adminOpt.isPresent() && passwordEncoder.matches(password, adminOpt.get().getPassword())) {
+            String token = JwtUtil.generateToken(adminOpt.get().getEmail());
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+            response.put("role", "admin");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Invalid admin email or password", HttpStatus.UNAUTHORIZED);
+    }
+
+    @PostMapping("/admin/sign-up")
+    public ResponseEntity<?> adminSignUp(@RequestBody Admin admin) {
+        Admin createdAdmin = adminService.createAdmin(admin);
+        return new ResponseEntity<>(createdAdmin, HttpStatus.CREATED);
+    }
+
+
 }
 
