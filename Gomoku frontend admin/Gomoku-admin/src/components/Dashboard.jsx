@@ -13,12 +13,12 @@ const Dashboard = ({ setIsLoggedIn }) => {
   return (
     <div className="min-h-screen flex">
       {/* Sidebar */}
-      <div className="w-64 bg-gray-900 text-white p-6 flex flex-col h-screen">
+      <div className="w-64 bg-gray-900 text-white flex flex-col h-screen p-6">
         <h1 className="text-4xl font-extrabold mb-8">Gomoku Admin</h1>
-        <div className="flex-1">
+        <div className="flex-1 space-y-2">
           <button
             onClick={() => setActiveTab('users')}
-            className={`w-full text-left py-3 px-4 rounded-lg mb-2 ${
+            className={`w-full text-left py-3 px-4 rounded-lg ${
               activeTab === 'users' ? 'bg-blue-600' : 'hover:bg-gray-700'
             } transition-all duration-300`}
           >
@@ -26,7 +26,7 @@ const Dashboard = ({ setIsLoggedIn }) => {
           </button>
           <button
             onClick={() => setActiveTab('gameRooms')}
-            className={`w-full text-left py-3 px-4 rounded-lg mb-2 ${
+            className={`w-full text-left py-3 px-4 rounded-lg ${
               activeTab === 'gameRooms' ? 'bg-blue-600' : 'hover:bg-gray-700'
             } transition-all duration-300`}
           >
