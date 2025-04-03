@@ -5,21 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="58b729f7-b168-4c5f-9d3c-ea02e414aa1a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/ai/create_ppo_model.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ai/get_ai_move.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ai/gomoku_env.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ai/train_ai.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/ai/get_ai_move.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/ai/gomoku_ppo.zip" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/ai/train_ai.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/src/main/java/com/btec/gomoku_game/controllers/AIController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ai_move.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gomoku_dqn.h5" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gomoku_dqn.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/src/main/java/com/btec/gomoku_game/configs/WebSocketGameHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/src/main/java/com/btec/gomoku_game/configs/WebSocketGameHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Gomoku frontend/Gomoku/src/pages/PlayWithAI.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/../Gomoku frontend/Gomoku/src/pages/PlayWithAI.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,23 +36,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Python.GomokuEnv.executor&quot;: &quot;Run&quot;,
-    &quot;Python.get_ai_move.executor&quot;: &quot;Run&quot;,
-    &quot;Python.gomoku_dqn.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.server.executor&quot;: &quot;Run&quot;,
-    &quot;Python.train_ai.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;AI&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/python projects/ASM&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Python.GomokuEnv.executor": "Run",
+    "Python.get_ai_move.executor": "Run",
+    "Python.gomoku_dqn.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.server.executor": "Run",
+    "Python.train_ai.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "AI-create",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "D:/python projects/ASM",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
+}]]></component>
   <component name="QodanaReportsService">
     <option name="descriptions">
       <ReportDescription localRun="true" path="C:\Users\Thanh\AppData\Local\Temp\qodana_output\qodana.sarif.json" reportGuid="9bfc5af3-8a8e-4c9b-bdd9-e43a9b5cc1e5" reportId="Gomoku AI/qodana/2025-03-20" />

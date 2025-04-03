@@ -27,6 +27,8 @@ const PlayOnline = () => {
   const [rematchRequestFrom, setRematchRequestFrom] = useState(null);
   const [rematchDeclined, setRematchDeclined] = useState(false);
   const [isGameFinished, setIsGameFinished] = useState(false);
+  const [winningCells, setWinningCells] = useState([]);
+  const [showWinnerModal, setShowWinnerModal] = useState(false);
 
   useEffect(() => {
     console.log("PlayOnline: Checking location.state:");
@@ -51,7 +53,7 @@ const PlayOnline = () => {
     const fetchRoomState = async () => {
       try {
         console.log(`Fetching room state for roomId: ${roomId}`);
-        const response = await fetch(`http://localhost:8080/api/games/get/${roomId}`, {
+        const response = await fetch(`https://gomoku.io.vn/api/games/get/${roomId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -80,6 +82,12 @@ const PlayOnline = () => {
           gameState.player1WantsRematch && gameState.player1 !== player ? gameState.player1 :
           gameState.player2WantsRematch && gameState.player2 !== player ? gameState.player2 : null
         );
+
+        if (gameState.winner) {
+          const winningCells = calculateWinningCells(gameState.board);
+          setWinningCells(winningCells);
+          setShowWinnerModal(true);
+        }
       } catch (error) {
         console.error("Error fetching room state:", error);
         setError(`Failed to fetch room state: ${error.message}. Please try again.`);
@@ -87,7 +95,7 @@ const PlayOnline = () => {
     };
 
     const socket = new SockJS(
-      `http://localhost:8080/ws/game?roomId=${roomId}&token=Bearer ${token}`
+      `https://gomoku.io.vn/ws/game?roomId=${roomId}&token=Bearer ${token}`
     );
     const stompClient = new Client({
       webSocketFactory: () => socket,
@@ -114,6 +122,15 @@ const PlayOnline = () => {
           setIsGameFinished(gameState.finished || false);
           setIsLoading(false);
 
+          if (gameState.winner) {
+            const winningCells = calculateWinningCells(gameState.board);
+            setWinningCells(winningCells);
+            setShowWinnerModal(true);
+          } else {
+            setWinningCells([]);
+            setShowWinnerModal(false);
+          }
+
           if (gameState.player1 === null && gameState.player2 !== null) {
             setNotification("The room creator has left. Returning to lobby...");
             setTimeout(() => {
@@ -133,6 +150,8 @@ const PlayOnline = () => {
           );
 
           if (gameState.rematchDeclined) {
+            setNotification(null);
+            setShowWinnerModal(false);
             setRematchDeclined(true);
             setNotification("Rematch declined. Returning to lobby...");
             setTimeout(() => {
@@ -142,14 +161,23 @@ const PlayOnline = () => {
           }
 
           if (gameState.player1WantsRematch && gameState.player2WantsRematch) {
+            // Reset tất cả trạng thái khi rematch được chấp nhận
+            
             setRematchRequested(false);
             setRematchRequestFrom(null);
             setRematchDeclined(false);
             setNotification("Starting a new game!");
             setWinner(null);
+            setWinningCells([]);
+            setNotification(null);
+            setShowWinnerModal(false); // Đảm bảo modal không hiển thị
+            setIsGameFinished(false);
           } else if (!gameState.finished) {
             setNotification(null);
+            setShowWinnerModal(false); // Đảm bảo modal không hiển thị khi trò chơi đang tiếp diễn
           } else if (playerWantsRematch && !otherPlayerWantsRematch && gameState.finished) {
+            setNotification(null);
+            setShowWinnerModal(false);
             setNotification("Waiting for the other player to respond...");
           }
         });
@@ -184,6 +212,74 @@ const PlayOnline = () => {
       stompClient.deactivate();
     };
   }, [roomId, player, navigate]);
+
+  const calculateWinningCells = (board) => {
+    const directions = [
+      [1, 0], // Ngang
+      [0, 1], // Dọc
+      [1, 1], // Chéo chính (\)
+      [1, -1], // Chéo phụ (/)
+    ];
+
+    for (let row = 0; row < BOARD_SIZE; row++) {
+      for (let col = 0; col < BOARD_SIZE; col++) {
+        if (!board[row][col]) continue;
+
+        for (const [dx, dy] of directions) {
+          let positions = [];
+          let count = 0;
+          let currentRow = row;
+          let currentCol = col;
+
+          // Kiểm tra các ô liên tiếp theo hướng hiện tại
+          while (
+            currentRow >= 0 &&
+            currentRow < BOARD_SIZE &&
+            currentCol >= 0 &&
+            currentCol < BOARD_SIZE &&
+            board[currentRow][currentCol] === board[row][col]
+          ) {
+            positions.push({ row: currentRow, col: currentCol });
+            count++;
+            currentRow += dx;
+            currentCol += dy;
+          }
+
+          // Kiểm tra hướng ngược lại
+          currentRow = row - dx;
+          currentCol = col - dy;
+          while (
+            currentRow >= 0 &&
+            currentRow < BOARD_SIZE &&
+            currentCol >= 0 &&
+            currentCol < BOARD_SIZE &&
+            board[currentRow][currentCol] === board[row][col]
+          ) {
+            positions.push({ row: currentRow, col: currentCol });
+            count++;
+            currentRow -= dx;
+            currentCol -= dy;
+          }
+
+          if (count >= 5) {
+            // Sắp xếp các vị trí theo thứ tự tăng dần
+            positions.sort((a, b) => {
+              if (dx !== 0 && dy !== 0) {
+                return a.row - b.row; // Chéo: sắp xếp theo row
+              } else if (dx !== 0) {
+                return a.row - b.row; // Dọc: sắp xếp theo row
+              } else {
+                return a.col - b.col; // Ngang: sắp xếp theo col
+              }
+            });
+            // Chỉ lấy 5 vị trí đầu tiên
+            return positions.slice(0, 5);
+          }
+        }
+      }
+    }
+    return [];
+  };
 
   const sendMove = (row, col) => {
     if (!client) {
@@ -287,6 +383,10 @@ const PlayOnline = () => {
     }
   };
 
+  const isWinningCell = (row, col) => {
+    return winningCells.some(cell => cell.row === row && cell.col === col);
+  };
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center bg-gray-900 text-white min-h-screen p-4">
@@ -318,11 +418,6 @@ const PlayOnline = () => {
         <p className="text-xl font-bold text-orange-800 animate-text-reveal text-center">
           Current Turn: <strong>{currentTurn}</strong>
         </p>
-        {winner && (
-          <p className="text-3xl mt-6 text-green-400 animate-text-reveal text-center">
-            Winner: {winner}
-          </p>
-        )}
         {error && (
           <p className="text-red-400 mt-6 animate-text-reveal text-center">{error}</p>
         )}
@@ -367,42 +462,69 @@ const PlayOnline = () => {
         )}
 
         {board && Array.isArray(board) ? (
-          <div
-            className="grid gap-1 mt-8 bg-gray-800/80 rounded-xl p-6 shadow-2xl animate-fade-slide-up"
-            style={{
-              gridTemplateColumns: `repeat(${BOARD_SIZE}, 1fr)`,
-              gridTemplateRows: `repeat(${BOARD_SIZE}, 1fr)`,
-              border: "2px solid #4b5563",
-            }}
-          >
-            {board.map((row, rIdx) =>
-              row.map((cell, cIdx) => (
-                <button
-                  key={`${rIdx}-${cIdx}`}
-                  onClick={() => sendMove(rIdx, cIdx)}
-                  className={`w-12 h-12 flex items-center justify-center rounded-md shadow-lg transition-all duration-300 transform hover:scale-110 ${
-                    cell === "X"
-                      ? "bg-blue-600 text-white animate-pulse"
-                      : cell === "O"
-                      ? "bg-red-600 text-white animate-pulse"
-                      : "bg-gray-700 hover:bg-gray-600 animate-bounce-in"
-                  }`}
-                  disabled={
-                    winner ||
-                    !player1 ||
-                    !player2 ||
-                    (player === player1 ? currentTurn !== "X" : currentTurn !== "O")
-                  }
-                >
-                  {cell || ""}
-                </button>
-              ))
-            )}
+          <div className="relative mt-8">
+            <div
+              className="grid gap-1 bg-gray-800/80 rounded-xl p-6 shadow-2xl animate-fade-slide-up"
+              style={{
+                gridTemplateColumns: `repeat(${BOARD_SIZE}, 1fr)`,
+                gridTemplateRows: `repeat(${BOARD_SIZE}, 1fr)`,
+                border: "2px solid #4b5563",
+              }}
+            >
+              {board.map((row, rIdx) =>
+                row.map((cell, cIdx) => (
+                  <button
+                    key={`${rIdx}-${cIdx}`}
+                    onClick={() => sendMove(rIdx, cIdx)}
+                    className={`w-12 h-12 flex items-center justify-center rounded-md shadow-lg transition-all duration-300 transform hover:scale-110 ${
+                      cell === "X"
+                        ? "bg-blue-600 text-white animate-pulse"
+                        : cell === "O"
+                        ? "bg-red-600 text-white animate-pulse"
+                        : "bg-gray-700 hover:bg-gray-600 animate-bounce-in"
+                    } ${isWinningCell(rIdx, cIdx) ? "winning-cell" : ""}`}
+                    disabled={
+                      winner ||
+                      !player1 ||
+                      !player2 ||
+                      (player === player1 ? currentTurn !== "X" : currentTurn !== "O")
+                    }
+                  >
+                    {cell || ""}
+                  </button>
+                ))
+              )}
+            </div>
           </div>
         ) : (
           <p className="text-red-400 mt-6 animate-text-reveal text-center">
             Error: Game board is not available.
           </p>
+        )}
+
+        {showWinnerModal && winner && (
+          <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+            <div className="bg-gray-800 rounded-xl p-8 shadow-2xl max-w-sm w-full transform transition-all duration-300 scale-100">
+              <h3 className="text-3xl font-bold text-green-400 mb-4 text-center">
+                Game Over!
+              </h3>
+              <p className="text-xl text-white mb-4 text-center">
+                Winner: <strong>{winner === "X" ? player1 : player2}</strong> ({winner})
+              </p>
+              <p className="text-xl text-white mb-6 text-center">
+                Loser: <strong>{winner === "X" ? player2 : player1}</strong> ({winner === "X" ? "O" : "X"})
+              </p>
+              <div className="flex justify-center">
+                <button
+                  onClick={() => setShowWinnerModal(false)}
+                  className="relative px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-xl hover:from-blue-600 hover:to-indigo-700 transform hover:scale-110 transition-all duration-500 group overflow-hidden"
+                >
+                  <span className="relative z-10">Close</span>
+                  <span className="absolute inset-0 bg-blue-400 opacity-0 group-hover:opacity-40 animate-pulse transition-opacity duration-500"></span>
+                </button>
+              </div>
+            </div>
+          </div>
         )}
 
         <div className="mt-8 w-full max-w-md animate-fade-slide-up flex flex-col items-center">
@@ -476,6 +598,15 @@ const PlayOnline = () => {
         @keyframes text-reveal {
           0% { opacity: 0; filter: blur(3px); transform: translateY(10px); }
           100% { opacity: 1; filter: blur(0); transform: translateY(0); }
+        }
+        @keyframes glow {
+          0% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 10px rgba(255, 255, 255, 0.3); }
+          50% { box-shadow: 0 0 15px rgba(255, 255, 255, 1), 0 0 25px rgba(255, 255, 255, 0.8); }
+          100% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 10px rgba(255, 255, 255, 0.3); }
+        }
+        .winning-cell {
+          border: 3px solid white !important;
+          animation: glow 1.5s ease-in-out infinite;
         }
         .animate-text-glow {
           animation: text-glow 3s ease-in-out infinite;
