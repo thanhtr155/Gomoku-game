@@ -115,7 +115,7 @@ def train_ai(episodes=1000):
     game.save_q_table()
     print("Training completed and Q-table saved to 'q_table.json'")
 
-if _name_ == "_main_":
+if __name__ == "_main_":
     train_ai(1000)
 
 

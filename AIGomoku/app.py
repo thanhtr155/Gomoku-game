@@ -5,7 +5,7 @@ import json
 import os
 import random
 
-app = Flask(_name_)
+app = Flask(__name__)
 CORS(app)
 
 BOARD_SIZE = 15
@@ -144,5 +144,5 @@ def ai_move():
         print(f"Error in ai_move: {e}")
         return jsonify({'error': str(e)}), 500
 
-if _name_ == "_main_":
+if __name__ == "_main_":
     app.run(host='0.0.0.0', port=5000)
