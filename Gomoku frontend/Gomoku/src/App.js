@@ -16,12 +16,12 @@ function App() {
   return (
    <BrowserRouter>
    <Routes>
-    <Route path='/' element={<HomePage />}/>
+    <Route path='/homepage' element={<HomePage />}/>
     <Route path='/main' element={<MainPage />}/>
     <Route path='/login' element={<Login />}/>
     <Route path='/register' element={<Register />}/>
     <Route path="/playoffline" element={<PlayOffline />}/>
-    <Route path="/playai" element={<PlayWithAI />}/>
+    <Route path="/" element={<PlayWithAI />}/>
     <Route path="/playonline" element={<PlayOnline />}/>
     <Route path="/rules" element={<ExplainRules />}/>
     <Route path="/lobby" element={<GameLobby/>}/>
