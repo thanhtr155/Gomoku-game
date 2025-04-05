@@ -10,8 +10,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
-                .allowedOriginPatterns("http://localhost:3000", "https://gomoku.io.vn", "http://127.0.0.1:5500") // Allow only specific frontend origin
+        registry.addMapping("/**")
+                .allowedOriginPatterns("http://localhost:3000", "https://gomoku.io.vn", "http://127.0.0.1:5500", "https://api.gomoku.io.vn")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);

@@ -81,7 +81,7 @@ class Gomoku:
             with open('q_table.json', 'r') as f:
                 self.q_table = json.load(f)
 
-def train_ai(episodes=1000):
+def train_ai(episodes=10000):
     game = Gomoku()
     for episode in range(episodes):
         game.reset()
@@ -115,8 +115,8 @@ def train_ai(episodes=1000):
     game.save_q_table()
     print("Training completed and Q-table saved to 'q_table.json'")
 
-if __name__ == "_main_":
-    train_ai(1000)
+if __name__ == "__main__":
+    train_ai(10000)
 
 
 class GomokuAI:
