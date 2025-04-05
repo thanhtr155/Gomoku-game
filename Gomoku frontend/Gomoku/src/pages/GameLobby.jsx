@@ -44,7 +44,7 @@
     const fetchAvailableRooms = async (token) => {
       try {
         console.log("Fetching available rooms with token:", token);
-        const response = await fetch("https://gomoku.io.vn/api/games/list", {
+        const response = await fetch("http://localhost:8080/api/games/list", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -80,7 +80,7 @@
           throw new Error("No token found. Please log in again.");
         }
 
-        const response = await fetch("https://gomoku.io.vn/api/games/create", {
+        const response = await fetch("http://localhost:8080/api/games/create", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -117,7 +117,7 @@
           throw new Error("No token found. Please log in again.");
         }
 
-        const response = await fetch("https://gomoku.io.vn/api/games/join", {
+        const response = await fetch("http://localhost:8080/api/games/join", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

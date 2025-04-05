@@ -53,7 +53,7 @@ const PlayOnline = () => {
     const fetchRoomState = async () => {
       try {
         console.log(`Fetching room state for roomId: ${roomId}`);
-        const response = await fetch(`https://gomoku.io.vn/api/games/get/${roomId}`, {
+        const response = await fetch(`http://localhost:8080/api/games/get/${roomId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -95,7 +95,7 @@ const PlayOnline = () => {
     };
 
     const socket = new SockJS(
-      `https://gomoku.io.vn/ws/game?roomId=${roomId}&token=Bearer ${token}`
+      `http://localhost:8080/ws/game?roomId=${roomId}&token=Bearer ${token}`
     );
     const stompClient = new Client({
       webSocketFactory: () => socket,
