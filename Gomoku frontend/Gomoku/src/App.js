@@ -10,13 +10,14 @@ import PlayOnline from './pages/PlayOnline';
 import MainPage from './pages/MainPage';
 import ExplainRules from './pages/ExplainRules'
 import GameLobby from './pages/GameLobby';
+import Profile from './pages/Profile';
 
 
 function App() {
   return (
    <BrowserRouter>
    <Routes>
-    <Route path='/' element={<HomePage />}/>
+   <Route path='/' element={<HomePage />}/>
     <Route path='/main' element={<MainPage />}/>
     <Route path='/login' element={<Login />}/>
     <Route path='/register' element={<Register />}/>
@@ -25,7 +26,7 @@ function App() {
     <Route path="/playonline" element={<PlayOnline />}/>
     <Route path="/rules" element={<ExplainRules />}/>
     <Route path="/lobby" element={<GameLobby/>}/>
-
+    <Route path="/profile" element={<Profile />} />
     
 
    </Routes>

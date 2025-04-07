@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { registerUser } from "../services/api"; // Import API function
+import { registerUser } from "../services/authService"; // Import API function
 
 const Register = () => {
   const navigate = useNavigate();
@@ -39,7 +39,7 @@ const Register = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-cover bg-center text-white p-6" style={{ backgroundImage: `url('https://wallpaperaccess.com/full/40409.jpg')` }}>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-cover bg-center text-white p-6" style={{ backgroundImage: `url('https://live.staticflickr.com/65535/49800246313_a2d9c644ee_b.jpg')` }}>
       <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 to-teal-900/50 animate-gradient-shift"></div>
       <div className="relative z-10 flex flex-col items-center">
         <h1 className="text-5xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-green-600 animate-text-glow">
