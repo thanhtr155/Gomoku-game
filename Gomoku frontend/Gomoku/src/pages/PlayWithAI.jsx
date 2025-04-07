@@ -310,7 +310,7 @@ export default function PlayWithAI() {
         Reset
       </button>
       <button
-        onClick={() => navigate("/")}
+        onClick={() => navigate("/main")}
         className="px-6 py-2 mt-4 bg-blue-500 rounded-lg hover:bg-blue-600"
       >
         Back

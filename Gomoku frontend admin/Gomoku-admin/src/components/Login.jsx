@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { FaEnvelope, FaLock } from 'react-icons/fa'; // Thêm react-icons
 
 const Login = ({ setIsLoggedIn }) => {
   const [email, setEmail] = useState('');
@@ -28,53 +27,47 @@ const Login = ({ setIsLoggedIn }) => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200">
-      <div className="bg-white p-8 rounded-2xl shadow-xl w-96 transform transition-all hover:scale-105 duration-300">
-        <h2 className="text-3xl font-extrabold mb-6 text-center text-gray-900 tracking-tight">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100">
+      <div className="bg-white p-8 rounded-xl shadow-2xl w-96 transform transition-all hover:scale-105 duration-300">
+        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800 tracking-tight">
           Admin Login
         </h2>
         <form onSubmit={handleLogin} className="space-y-6">
           <div className="relative">
-            <label className="block text-gray-700 font-semibold mb-2">Email</label>
-            <div className="flex items-center border-2 border-gray-200 rounded-lg focus-within:border-blue-500 transition-all duration-300">
-              <FaEnvelope className="text-gray-400 mx-3" />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-3 rounded-lg focus:outline-none"
-                required
-                placeholder="Enter your email"
-              />
-            </div>
+            <label className="block text-gray-700 font-medium mb-1">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+              required
+              placeholder="Enter your email"
+            />
           </div>
           <div className="relative">
-            <label className="block text-gray-700 font-semibold mb-2">Password</label>
-            <div className="flex items-center border-2 border-gray-200 rounded-lg focus-within:border-blue-500 transition-all duration-300">
-              <FaLock className="text-gray-400 mx-3" />
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-3 rounded-lg focus:outline-none"
-                required
-                placeholder="Enter your password"
-              />
-            </div>
+            <label className="block text-gray-700 font-medium mb-1">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+              required
+              placeholder="Enter your password"
+            />
           </div>
           {error && (
-            <p className="text-red-600 text-sm text-center bg-red-100 p-2 rounded-lg animate-fade-in">
+            <p className="text-red-500 text-sm text-center bg-red-50 p-2 rounded-lg animate-pulse">
               {error}
             </p>
           )}
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-700 text-white p-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-800 transition-all duration-300 hover:shadow-lg active:scale-95"
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white p-3 rounded-lg font-semibold hover:from-blue-600 hover:to-purple-700 transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 active:scale-95"
           >
             Login
           </button>
         </form>
-        <p className="mt-4 text-center text-gray-600 text-sm font-medium">
+        <p className="mt-4 text-center text-gray-500 text-sm">
           Secured Admin Access Only
         </p>
       </div>
@@ -83,6 +76,3 @@ const Login = ({ setIsLoggedIn }) => {
 };
 
 export default Login;
-
-// Thêm animation trong Tailwind config hoặc CSS
-// animate-fade-in: keyframes { from { opacity: 0 } to { opacity: 1 } }

@@ -18,15 +18,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic"); // Định nghĩa prefix cho các topic
-        config.setApplicationDestinationPrefixes("/app"); // Định nghĩa prefix cho các message gửi đến
+        config.enableSimpleBroker("/topic");
+        config.setApplicationDestinationPrefixes("/app");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws/game")
-                .setAllowedOriginPatterns("http://localhost:3000", "https://gomoku.io.vn", "http://127.0.0.1:5500", "https://api.gomoku.io.vn")
+                .setAllowedOriginPatterns("http://localhost:3000", "http://gomoku.io.vn")
                 .addInterceptors(handshakeInterceptor)
                 .withSockJS();
     }
 }
+
