@@ -23,6 +23,17 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
+    // Thêm phương thức verifyPassword để kiểm tra mật khẩu
+    public boolean verifyPassword(User user, String rawPassword) {
+        return passwordEncoder.matches(rawPassword, user.getPassword());
+    }
+
+    // Thêm phương thức updatePassword để cập nhật mật khẩu
+    public void updatePassword(User user, String newPassword) {
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email).orElse(null);
     }
