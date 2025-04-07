@@ -21,7 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
+@CrossOrigin
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
