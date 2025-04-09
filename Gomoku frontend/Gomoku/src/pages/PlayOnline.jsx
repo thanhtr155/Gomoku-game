@@ -108,7 +108,7 @@ const PlayOnline = () => {
         if (gameState.winner) {
           setWinningCells(findWinningCells(gameState.board, gameState.winner));
           if (!gameState.player1WantsRematch && !gameState.player2WantsRematch) {
-            setShowWinnerModal(true); // Chỉ hiển thị modal nếu chưa có yêu cầu rematch
+            setShowWinnerModal(true);
           }
         }
       } catch (error) {
@@ -149,7 +149,6 @@ const PlayOnline = () => {
 
           if (gameState.winner) {
             setWinningCells(findWinningCells(gameState.board, gameState.winner));
-            // Chỉ hiển thị modal nếu không có yêu cầu rematch từ người chơi khác
             if (!otherPlayerWantsRematch && !playerWantsRematch) {
               setShowWinnerModal(true);
             } else {
@@ -179,7 +178,7 @@ const PlayOnline = () => {
             setNotification(null);
           } else if (playerWantsRematch && !otherPlayerWantsRematch && gameState.finished) {
             setNotification("Waiting for the other player to respond...");
-            setShowWinnerModal(false); // Ẩn modal khi đang chờ phản hồi rematch
+            setShowWinnerModal(false);
           }
         });
 
@@ -252,7 +251,7 @@ const PlayOnline = () => {
     });
     setRematchRequested(true);
     setNotification("Waiting for the other player to respond...");
-    setShowWinnerModal(false); // Ẩn modal khi yêu cầu rematch
+    setShowWinnerModal(false);
   };
 
   const respondToRematch = (accepted) => {
@@ -303,7 +302,7 @@ const PlayOnline = () => {
         </p>
         {error && <p className="text-red-400 mt-6 animate-text-reveal text-center">{error}</p>}
         {notification && (
-          <p className="text-yellow-400 mt-6 animate-text-reveal text-center">{notification}</p>
+          <p className="text-black mt-6 animate-text-reveal text-center">{notification}</p>
         )}
 
         {showWinnerModal && winner && (
@@ -338,7 +337,7 @@ const PlayOnline = () => {
 
         {rematchRequestFrom && !rematchRequested && !rematchDeclined && (
           <div className="mt-6 animate-fade-slide-up flex flex-col items-center">
-            <p className="text-lg text-gray-300 animate-text-reveal text-center">
+            <p className="text-lg text-black animate-text-reveal text-center"> {/* Đổi màu thành đen */}
               {rematchRequestFrom} wants to rematch. Do you agree?
             </p>
             <div className="flex justify-center space-x-4 mt-4">
