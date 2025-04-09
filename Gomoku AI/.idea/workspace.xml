@@ -6,12 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="58b729f7-b168-4c5f-9d3c-ea02e414aa1a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ai/board.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ai/create_ppo_model.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ai/get_ai_move.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ai/gomoku_env.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ai/gomoku_ppo.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ai/train_ai.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/q_table.json" beforeDir="false" afterPath="$PROJECT_DIR$/q_table.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/src/main/java/com/btec/gomoku_game/configs/CorsConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Gomoku backend/gomoku-game/src/main/java/com/btec/gomoku_game/configs/CorsConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../Gomoku frontend/Gomoku/src/services/authService.js" beforeDir="false" afterPath="$PROJECT_DIR$/../Gomoku frontend/Gomoku/src/services/authService.js" afterDir="false" />
     </list>

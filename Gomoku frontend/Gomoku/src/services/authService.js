@@ -4,17 +4,22 @@ const API_URL = "http://localhost:8080/api/auth";
 
 export const loginUser = async (email, password) => {
   try {
-    const response = await axios.post(`${API_URL}/sign-in`, { email, password });
+    const response = await axios.post(`${API_URL}/sign-in`, { email, password }, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,
+    });
     const { token } = response.data;
-    if (token) {
-      localStorage.setItem("token", token);
-      localStorage.setItem("userEmail", email);
-      console.log("Token saved:", token);
-      console.log("Email saved:", email);
-      // Thêm log để kiểm tra giá trị trong localStorage sau khi lưu
-      console.log("After saving - token in localStorage:", localStorage.getItem("token"));
-      console.log("After saving - userEmail in localStorage:", localStorage.getItem("userEmail"));
-    }
+      if (token) {
+        localStorage.setItem("token", token);
+        localStorage.setItem("userEmail", email);
+        console.log("Token saved:", token);
+        console.log("Email saved:", email);
+        // Thêm log để kiểm tra giá trị trong localStorage sau khi lưu
+        console.log("After saving - token in localStorage:", localStorage.getItem("token"));
+        console.log("After saving - userEmail in localStorage:", localStorage.getItem("userEmail"));
+      }
     return response.data;
   } catch (error) {
     console.error("Login error:", error.response?.data);
