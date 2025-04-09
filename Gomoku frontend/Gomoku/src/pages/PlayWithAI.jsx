@@ -1,32 +1,25 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-// Lớp GomokuAI được chuyển từ Python sang JavaScript
 class GomokuAI {
   constructor(size = 15) {
     this.size = size;
-    this.qTable = {}; // Q-table sẽ được tải từ q_table.json
+    this.qTable = {};
     this.learningRate = 0.1;
     this.discountFactor = 0.9;
     this.epsilon = 0.1;
   }
 
-  // Tải Q-table từ dữ liệu JSON
   loadQTable(qTableData) {
     this.qTable = qTableData || {};
   }
 
-  // Không cần saveQTable trong front-end
-  saveQTable() {
-    // Để trống vì không lưu trong front-end
-  }
+  saveQTable() {}
 
-  // Chuyển trạng thái bàn cờ thành chuỗi
   boardToState(board) {
     return board.map(cell => (cell === null ? "0" : cell === "X" ? "1" : "2")).join("");
   }
 
-  // Đánh giá bàn cờ
   evaluateBoard(board, player, opponent) {
     let score = 0;
     const board2D = this.to2DArray(board);
@@ -53,7 +46,6 @@ class GomokuAI {
     return score;
   }
 
-  // Đánh giá một dòng (5 ô liên tiếp)
   evaluateLine(line, player, opponent) {
     let score = 0;
     for (let i = 0; i <= line.length - 5; i++) {
@@ -78,7 +70,6 @@ class GomokuAI {
     return score;
   }
 
-  // Tìm các nước đi tiềm năng
   getPotentialMoves(board) {
     const potentialMoves = new Set();
     const board2D = this.to2DArray(board);
@@ -104,7 +95,6 @@ class GomokuAI {
       : board.map((cell, i) => (cell === null ? i : null)).filter(i => i !== null);
   }
 
-  // Chọn nước đi tốt nhất
   getBestMove(board, player = "X", opponent = "O") {
     const state = this.boardToState(board);
     const potentialMoves = this.getPotentialMoves(board);
@@ -141,7 +131,6 @@ class GomokuAI {
     return bestMove;
   }
 
-  // Tìm nước đi phòng thủ
   findDefensiveMove(board, opponent, player) {
     const board2D = this.to2DArray(board);
     const directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
@@ -184,7 +173,6 @@ class GomokuAI {
     return null;
   }
 
-  // Chuyển mảng 1D thành 2D
   to2DArray(board) {
     const board2D = [];
     for (let i = 0; i < this.size; i++) {
@@ -200,8 +188,10 @@ export default function PlayWithAI() {
   const [board, setBoard] = useState(Array(size * size).fill(null));
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [ai, setAI] = useState(null);
+  const winner = calculateWinner(board, size);
+  const winningCells = winner ? findWinningCells(board, size, winner) : [];
+  const isDraw = !winner && board.every(cell => cell !== null);
 
-  // Khởi tạo AI và tải Q-table
   useEffect(() => {
     async function initializeAI() {
       try {
@@ -220,7 +210,6 @@ export default function PlayWithAI() {
     initializeAI();
   }, []);
 
-  // Hàm chạy nước đi của AI
   function playAIMove(currentBoard) {
     if (!ai) return;
 
@@ -231,12 +220,9 @@ export default function PlayWithAI() {
       setBoard(newBoard);
       setIsPlayerTurn(true);
     } else {
-      setIsPlayerTurn(true); // Nếu AI không tìm được nước đi, chuyển lượt lại cho người chơi
+      setIsPlayerTurn(true);
     }
   }
-
-  const winner = calculateWinner(board, size);
-  const isDraw = !winner && board.every(cell => cell !== null);
 
   function handleClick(index) {
     if (board[index] || winner || !isPlayerTurn) return;
@@ -270,6 +256,41 @@ export default function PlayWithAI() {
     return null;
   }
 
+  function findWinningCells(board, size, winner) {
+    const directions = [[1, 0], [0, 1], [1, 1], [1, -1]];
+    const winningCells = [];
+    for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size; c++) {
+        const start = r * size + c;
+        if (!board[start] || board[start] !== winner) continue;
+
+        for (const [dx, dy] of directions) {
+          let count = 1;
+          const cells = [start];
+          for (let step = 1; step < 5; step++) {
+            const x = r + dx * step;
+            const y = c + dy * step;
+            if (x >= size || y >= size || y < 0) break;
+            const next = x * size + y;
+            if (board[next] === board[start]) {
+              count++;
+              cells.push(next);
+            } else {
+              break;
+            }
+          }
+          if (count === 5) return cells;
+        }
+      }
+    }
+    return winningCells;
+  }
+
+  const resetGame = () => {
+    setBoard(Array(size * size).fill(null));
+    setIsPlayerTurn(true);
+  };
+
   return (
     <div
       className="flex flex-col items-center min-h-screen text-white"
@@ -290,32 +311,83 @@ export default function PlayWithAI() {
             key={i}
             onClick={() => handleClick(i)}
             disabled={cell || winner || !isPlayerTurn}
-            className="w-10 h-10 flex items-center justify-center bg-gray-800 border border-gray-600 rounded-lg hover:bg-gray-700"
+            className={`w-10 h-10 flex items-center justify-center rounded-lg border border-gray-600 hover:bg-gray-700 ${
+              winningCells.includes(i)
+                ? "bg-white text-black font-bold border-2 border-gray-300 animate-pulse"
+                : cell === "X"
+                ? "bg-blue-600 text-white"
+                : cell === "O"
+                ? "bg-red-600 text-white"
+                : "bg-gray-800"
+            }`}
           >
             {cell}
           </button>
         ))}
       </div>
-      {winner && (
-        <p className="mt-4 text-xl font-semibold">{winner === "O" ? "You Win!" : "Bot Wins!"}</p>
+
+      {(winner || isDraw) && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-gray-900 bg-opacity-90 p-8 rounded-xl shadow-2xl animate-fade-in">
+            <h2 className="text-4xl font-bold text-center mb-4">
+              {winner ? (
+                <span className="text-green-400">{winner === "O" ? "You Win!" : "Bot Wins!"}</span>
+              ) : (
+                <span className="text-yellow-400">It's a Draw!</span>
+              )}
+            </h2>
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={resetGame}
+                className="px-6 py-2 bg-red-500 rounded-lg hover:bg-red-600 transition-all duration-300"
+              >
+                Play Again
+              </button>
+              <button
+                onClick={() => navigate("/main")}
+                className="px-6 py-2 bg-blue-500 rounded-lg hover:bg-blue-600 transition-all duration-300"
+              >
+                Back to Main
+              </button>
+            </div>
+          </div>
+        </div>
       )}
-      {isDraw && <p className="mt-4 text-xl font-semibold">It's a Draw!</p>}
-      <button
-        onClick={() => {
-          setBoard(Array(size * size).fill(null));
-          setIsPlayerTurn(true);
-        }}
-        className="mt-4 px-4 py-2 bg-red-500 rounded-lg hover:bg-red-600"
-      >
-        Reset
-      </button>
-      <button
-        onClick={() => navigate("/main")}
-        className="px-6 py-2 mt-4 bg-blue-500 rounded-lg hover:bg-blue-600"
-      >
-        Back
-      </button>
+
+      {!winner && !isDraw && (
+        <div className="mt-4 flex space-x-4">
+          <button
+            onClick={resetGame}
+            className="px-4 py-2 bg-red-500 rounded-lg hover:bg-red-600"
+          >
+            Reset
+          </button>
+          <button
+            onClick={() => navigate("/main")}
+            className="px-6 py-2 bg-blue-500 rounded-lg hover:bg-blue-600"
+          >
+            Back
+          </button>
+        </div>
+      )}
+
+      <style jsx>{`
+        @keyframes fade-in {
+          0% { opacity: 0; transform: scale(0.9); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes pulse {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.1); }
+          100% { transform: scale(1); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.5s ease-out;
+        }
+        .animate-pulse {
+          animation: pulse 0.8s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
-  
 }

@@ -44,7 +44,7 @@ public class AuthController {
     public ResponseEntity<?> signUp(@RequestBody User user) {
         // Check if the email already exists
         if (userService.getUserByEmail(user.getEmail()) != null) {
-            return new ResponseEntity<>("Email is already taken", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Email is already taken", HttpStatus.UNAUTHORIZED);
         }
 
         // Save the user with a hashed password
