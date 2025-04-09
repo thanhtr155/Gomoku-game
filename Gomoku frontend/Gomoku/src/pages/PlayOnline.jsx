@@ -16,7 +16,7 @@ const PlayOnline = () => {
   );
   const [currentTurn, setCurrentTurn] = useState("X");
   const [winner, setWinner] = useState(null);
-  const [winningCells, setWinningCells] = useState([]); // Lưu các ô thắng
+  const [winningCells, setWinningCells] = useState([]);
   const [player1, setPlayer1] = useState(null);
   const [player2, setPlayer2] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -28,14 +28,11 @@ const PlayOnline = () => {
   const [rematchRequestFrom, setRematchRequestFrom] = useState(null);
   const [rematchDeclined, setRematchDeclined] = useState(false);
   const [isGameFinished, setIsGameFinished] = useState(false);
+  const [showWinnerModal, setShowWinnerModal] = useState(false);
 
-  // Hàm tìm các ô thắng
   const findWinningCells = (board, winnerSymbol) => {
     const directions = [
-      [1, 0], // Ngang
-      [0, 1], // Dọc
-      [1, 1], // Chéo chính
-      [1, -1], // Chéo phụ
+      [1, 0], [0, 1], [1, 1], [1, -1],
     ];
 
     for (let r = 0; r < BOARD_SIZE; r++) {
@@ -60,9 +57,7 @@ const PlayOnline = () => {
               break;
             }
           }
-          if (count === 5) {
-            return cells; // Trả về danh sách các ô thắng
-          }
+          if (count === 5) return cells;
         }
       }
     }
@@ -112,6 +107,9 @@ const PlayOnline = () => {
 
         if (gameState.winner) {
           setWinningCells(findWinningCells(gameState.board, gameState.winner));
+          if (!gameState.player1WantsRematch && !gameState.player2WantsRematch) {
+            setShowWinnerModal(true); // Chỉ hiển thị modal nếu chưa có yêu cầu rematch
+          }
         }
       } catch (error) {
         setError(`Failed to fetch room state: ${error.message}. Please try again.`);
@@ -139,12 +137,6 @@ const PlayOnline = () => {
           setIsGameFinished(gameState.finished || false);
           setIsLoading(false);
 
-          if (gameState.winner) {
-            setWinningCells(findWinningCells(gameState.board, gameState.winner));
-          } else {
-            setWinningCells([]);
-          }
-
           const isPlayer1 = gameState.player1 === player;
           const playerWantsRematch = isPlayer1 ? gameState.player1WantsRematch : gameState.player2WantsRematch;
           const otherPlayerWantsRematch = isPlayer1 ? gameState.player2WantsRematch : gameState.player1WantsRematch;
@@ -155,21 +147,39 @@ const PlayOnline = () => {
             otherPlayerWantsRematch && otherPlayerEmail !== player ? otherPlayerEmail : null
           );
 
+          if (gameState.winner) {
+            setWinningCells(findWinningCells(gameState.board, gameState.winner));
+            // Chỉ hiển thị modal nếu không có yêu cầu rematch từ người chơi khác
+            if (!otherPlayerWantsRematch && !playerWantsRematch) {
+              setShowWinnerModal(true);
+            } else {
+              setShowWinnerModal(false);
+            }
+          } else {
+            setWinningCells([]);
+            setShowWinnerModal(false);
+          }
+
           if (gameState.rematchDeclined) {
             setRematchDeclined(true);
+            setWinningCells([]);
+            setShowWinnerModal(false);
             setNotification("Rematch declined. Returning to lobby...");
             setTimeout(() => navigate("/lobby"), 2000);
           } else if (gameState.player1WantsRematch && gameState.player2WantsRematch) {
+            setShowWinnerModal(false);
             setRematchRequested(false);
             setRematchRequestFrom(null);
             setRematchDeclined(false);
             setNotification("Starting a new game!");
             setWinner(null);
             setWinningCells([]);
+            setShowWinnerModal(false);
           } else if (!gameState.finished) {
             setNotification(null);
           } else if (playerWantsRematch && !otherPlayerWantsRematch && gameState.finished) {
             setNotification("Waiting for the other player to respond...");
+            setShowWinnerModal(false); // Ẩn modal khi đang chờ phản hồi rematch
           }
         });
 
@@ -242,6 +252,7 @@ const PlayOnline = () => {
     });
     setRematchRequested(true);
     setNotification("Waiting for the other player to respond...");
+    setShowWinnerModal(false); // Ẩn modal khi yêu cầu rematch
   };
 
   const respondToRematch = (accepted) => {
@@ -255,6 +266,10 @@ const PlayOnline = () => {
       setNotification("Rematch declined. Returning to lobby...");
       setTimeout(() => navigate("/lobby"), 2000);
     }
+  };
+
+  const closeWinnerModal = () => {
+    setShowWinnerModal(false);
   };
 
   if (isLoading) {
@@ -286,14 +301,27 @@ const PlayOnline = () => {
         <p className="text-xl font-bold text-orange-800 animate-text-reveal text-center">
           Current Turn: <strong>{currentTurn}</strong>
         </p>
-        {winner && (
-          <p className="text-3xl mt-6 text-green-400 animate-text-reveal text-center">
-            Winner: {winner}
-          </p>
-        )}
         {error && <p className="text-red-400 mt-6 animate-text-reveal text-center">{error}</p>}
         {notification && (
           <p className="text-yellow-400 mt-6 animate-text-reveal text-center">{notification}</p>
+        )}
+
+        {showWinnerModal && winner && (
+          <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className="bg-gray-900 bg-opacity-90 p-8 rounded-xl shadow-2xl animate-modal-pop">
+              <h2 className="text-4xl font-bold text-green-400 text-center mb-6">
+                Winner: {winner}
+              </h2>
+              <div className="flex justify-center">
+                <button
+                  onClick={closeWinnerModal}
+                  className="px-6 py-2 bg-blue-500 rounded-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-105"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
         )}
 
         {winner && !rematchRequested && !rematchDeclined && (
@@ -351,7 +379,7 @@ const PlayOnline = () => {
                       onClick={() => sendMove(rIdx, cIdx)}
                       className={`w-12 h-12 flex items-center justify-center rounded-md shadow-lg transition-all duration-300 transform hover:scale-110 ${
                         isWinningCell
-                          ? "bg-yellow-500 text-black animate-pulse-scale border-2 border-yellow-300"
+                          ? "bg-white text-black font-bold border-2 border-gray-300 animate-pulse-scale"
                           : cell === "X"
                           ? "bg-blue-600 text-white animate-pulse"
                           : cell === "O"
@@ -453,6 +481,11 @@ const PlayOnline = () => {
           50% { transform: scale(1.1); }
           100% { transform: scale(1); }
         }
+        @keyframes modal-pop {
+          0% { opacity: 0; transform: scale(0.8); }
+          50% { transform: scale(1.05); }
+          100% { opacity: 1; transform: scale(1); }
+        }
         .animate-text-glow {
           animation: text-glow 3s ease-in-out infinite;
         }
@@ -467,6 +500,9 @@ const PlayOnline = () => {
         }
         .animate-pulse-scale {
           animation: pulse-scale 0.8s ease-in-out infinite;
+        }
+        .animate-modal-pop {
+          animation: modal-pop 0.5s ease-out;
         }
       `}</style>
     </div>
